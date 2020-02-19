@@ -1,0 +1,100 @@
+version: 2.1
+
+description: |
+  mojaloop/deployment is a CircleCI orb for deploying updated docker images to our 
+  running kubernetes cluster using helm.
+
+executors:
+  helm-kube:
+    parameters:
+      version:
+        type: string
+        default: "2.14"
+    working_directory: /home/circleci/project
+    docker: 
+      - image: hypnoglow/kubernetes-helm:<<parameters.version>>
+
+commands:
+  setup_and_run:
+    parameters:
+      helm_image_path:
+        description: The place in the helm config that specifies the image for a given service
+        type: string
+        default: .central.centralhub.centralledger.containers
+    description: Set up kubectl and helm, and deploy the updated container
+    steps:
+      - run: 
+          name: Set up AWS tools
+          command: |
+              apk --no-cache add \
+                      python \
+                      py-pip \
+                      groff \
+                      less \
+                      mailcap
+              pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
+              apk -v --purge del py-pip
+      - run:
+          name: Set env variables
+          command: |
+            # TODO: do a better job of this...
+            if [[ ${CIRCLE_TAG} =~ v[0-9]+(\.[0-9]+)*(\-snapshot) ]]; then
+              echo "Setting snapshot env vars for ${CIRCLE_TAG}"
+
+              echo 'export RELEASE_TAG=$RELEASE_TAG_SNAPSHOT' >> $BASH_ENV
+              echo 'export HELM_VALUE_FILENAME=$K8_HELM_VALUE_FILENAME_SNAPSHOT' >> $BASH_ENV
+              echo 'export K8_CLUSTER_SERVER=$K8_CLUSTER_SERVER_SNAPSHOT' >> $BASH_ENV
+              echo 'export K8_RELEASE_NAME=$K8_RELEASE_NAME_SNAPSHOT' >> $BASH_ENV
+              echo 'export K8_NAMESPACE=$K8_NAMESPACE_SNAPSHOT' >> $BASH_ENV
+              echo 'export K8_USER_NAME=$K8_USER_NAME_SNAPSHOT' >> $BASH_ENV
+              echo 'export K8_USER_TOKEN=$K8_USER_TOKEN_SNAPSHOT' >> $BASH_ENV
+              echo 'export K8_HELM_CHART_NAME=$K8_HELM_CHART_NAME_SNAPSHOT' >> $BASH_ENV
+              echo 'export K8_HELM_CHART_VERSION=$K8_HELM_CHART_VERSION_SNAPSHOT' >> $BASH_ENV
+
+              # TODO: confirm that org variables work!
+              echo 'export HELM_VALUE_SET_VALUES="--set <<parameters.helm_image_path>>.api.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME --set <<parameters.helm_image_path>>.api.image.tag=$CIRCLE_TAG --set <<parameters.helm_image_path>>.admin.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME --set <<parameters.helm_image_path>>.admin.image.tag=$CIRCLE_TAG"' >> $BASH_ENV
+              # TODO: remove once we've tested
+              cat $BASH_ENV | grep HELM_VALUE_SET_VALUES
+
+              exit 0
+            fi
+
+            if [[ ${CIRCLE_TAG} =~ v[0-9]+(\.[0-9]+)* ]]; then
+              echo "Setting prod env vars for ${CIRCLE_TAG}"
+
+              echo 'export RELEASE_TAG=$RELEASE_TAG_PROD' >> $BASH_ENV
+              echo 'export HELM_VALUE_FILENAME=$K8_HELM_VALUE_FILENAME_PROD' >> $BASH_ENV
+              echo 'export K8_CLUSTER_SERVER=$K8_CLUSTER_SERVER_PROD' >> $BASH_ENV
+              echo 'export K8_RELEASE_NAME=$K8_RELEASE_NAME_PROD' >> $BASH_ENV
+              echo 'export K8_NAMESPACE=$K8_NAMESPACE_PROD' >> $BASH_ENV
+              echo 'export K8_USER_NAME=$K8_USER_NAME_PROD' >> $BASH_ENV
+              echo 'export K8_USER_TOKEN=$K8_USER_TOKEN_PROD' >> $BASH_ENV
+              echo 'export K8_HELM_CHART_NAME=$K8_HELM_CHART_NAME_PROD' >> $BASH_ENV
+              echo 'export K8_HELM_CHART_VERSION=$K8_HELM_CHART_VERSION_PROD' >> $BASH_ENV
+
+              # TODO: confirm that org variables work!
+              echo 'export HELM_VALUE_SET_VALUES="--set <<parameters.helm_image_path>>.api.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME --set <<parameters.helm_image_path>>.api.image.tag=$CIRCLE_TAG --set <<parameters.helm_image_path>>.admin.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME --set <<parameters.helm_image_path>>.admin.image.tag=$CIRCLE_TAG"' >> $BASH_ENV
+              # TODO: remove once we've tested
+              cat $BASH_ENV | grep HELM_VALUE_SET_VALUES
+              exit 0
+            fi
+
+            echo "No valid match found for CIRCLE_TAG: ${CIRCLE_TAG}"
+            exit 1
+      - run:
+          name: Set up kubectl and helm
+          command: |
+            mkdir -p $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM
+            aws s3 cp $AWS_S3_URI_DEVOPS_DEPLOYMENT_CONFIG/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/$HELM_VALUE_FILENAME $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/
+
+            kubectl config set-cluster $K8_CLUSTER_NAME --server=$K8_CLUSTER_SERVER --insecure-skip-tls-verify=true
+            kubectl config set-credentials $K8_USER_NAME --token=$K8_USER_TOKEN
+            kubectl config set-context $K8_CLUSTER_NAME --cluster=$K8_CLUSTER_NAME --user=$K8_USER_NAME --namespace=$K8_NAMESPACE
+            kubectl config use-context $K8_CLUSTER_NAME
+
+            helm repo add mojaloop $HELM_MOJALOOP_REPO_PATH
+            helm init --client-only
+      - run:
+          name: Deploy updated service
+          command: |
+            helm upgrade $K8_RELEASE_NAME --repo=$HELM_MOJALOOP_REPO_PATH --version $K8_HELM_CHART_VERSION --reuse-values $HELM_VALUE_SET_VALUES -f $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/$HELM_VALUE_FILENAME $K8_HELM_CHART_NAME --install
