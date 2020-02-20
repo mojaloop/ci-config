@@ -6,8 +6,6 @@ To begin with, this will host CircleCI orbs we author and publish, but this coul
 
 ## CircleCI Orb: mojaloop-deployment
 
-[todo: instructions for publishing]
-
 download your access token etc: https://circleci.com/docs/2.0/local-cli/#configuring-the-cli
 ```bash
 # setup your env
