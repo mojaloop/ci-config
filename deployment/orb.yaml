@@ -17,31 +17,37 @@ executors:
 commands:
   setup_and_run:
     parameters:
-      helm_image_path:
-        description: The place in the helm config that specifies the image for a given service
+      helm_set_values:
+        description: The update string to pass through to `helm upgrade`
         type: string
-        default: .central.centralhub.centralledger.containers
+        # default: .central.centralhub.centralledger.containers
+        default: "--set .central.centralhub.centralledger.containers.api.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME --set .central.centralhub.centralledger.containers.api.image.tag=$CIRCLE_TAG"
     description: Set up kubectl and helm, and deploy the updated container
     steps:
       - run: 
-          name: Set up AWS tools
+          name: Set up tools
           command: |
               apk --no-cache add \
                       python \
                       py-pip \
                       groff \
                       less \
-                      mailcap
+                      mailcap \
+                      jq
               pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
               apk -v --purge del py-pip
       - run:
           name: Set env variables
           command: |
-              echo 'export HELM_VALUE_SET_VALUES="--set <<parameters.helm_image_path>>.api.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME --set <<parameters.helm_image_path>>.api.image.tag=$CIRCLE_TAG --set <<parameters.helm_image_path>>.admin.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME --set <<parameters.helm_image_path>>.admin.image.tag=$CIRCLE_TAG"' >> $BASH_ENV
+            set -u
+            echo 'export HELM_VALUE_SET_VALUES="<<parameters.helm_set_values>>"' >> $BASH_ENV
+            K8_HELM_CHART_VERSION=$(curl -s https://api.github.com/repos/mojaloop/helm/releases/latest | jq -r '.tag_name')
+            echo "export K8_HELM_CHART_VERSION=${K8_HELM_CHART_VERSION}" >> $BASH_ENV
       - run:
           name: Set up kubectl and helm
           command: |
             set -u
+            
             mkdir -p $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM
             aws s3 cp $AWS_S3_URI_DEVOPS_DEPLOYMENT_CONFIG/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/$HELM_VALUE_FILENAME $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/
 
