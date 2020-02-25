@@ -21,7 +21,10 @@ commands:
         description: The update string to pass through to `helm upgrade`
         type: string
         # default: .central.centralhub.centralledger.containers
-        default: "--set .central.centralhub.centralledger.containers.api.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME --set .central.centralhub.centralledger.containers.api.image.tag=$CIRCLE_TAG"
+        default: |
+          --set quoting-service.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME \
+          --set quoting-service.image.tag=$CIRCLE_TAG
+
     description: Set up kubectl and helm, and deploy the updated container
     steps:
       - run: 
@@ -48,8 +51,9 @@ commands:
           command: |
             set -u
             
+            # Download the latest values.yaml file from the mojaloop/helm repo
             mkdir -p $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM
-            aws s3 cp $AWS_S3_URI_DEVOPS_DEPLOYMENT_CONFIG/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/$HELM_VALUE_FILENAME $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/
+            curl -s https://github.com/mojaloop/helm/blob/${K8_HELM_CHART_VERSION}/mojaloop/values.yaml > $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/$HELM_VALUE_FILENAME
 
             kubectl config set-cluster $K8_CLUSTER_NAME --server=$K8_CLUSTER_SERVER --insecure-skip-tls-verify=true
             kubectl config set-credentials $K8_USER_NAME --token=$K8_USER_TOKEN
