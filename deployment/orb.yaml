@@ -53,7 +53,7 @@ commands:
             
             # Download the latest values.yaml file from the mojaloop/helm repo
             mkdir -p $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM
-            curl -s https://github.com/mojaloop/helm/blob/${K8_HELM_CHART_VERSION}/mojaloop/values.yaml > $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/$HELM_VALUE_FILENAME
+            curl -s https://raw.githubusercontent.com/mojaloop/helm/${K8_HELM_CHART_VERSION}/mojaloop/values.yaml > $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/$HELM_VALUE_FILENAME
 
             kubectl config set-cluster $K8_CLUSTER_NAME --server=$K8_CLUSTER_SERVER --insecure-skip-tls-verify=true
             kubectl config set-credentials $K8_USER_NAME --token=$K8_USER_TOKEN
