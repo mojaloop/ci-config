@@ -12,7 +12,7 @@
 
 const fs = require('fs')
 const util = require('util')
-
+const crypto = require('crypto')
 
 /**
  * @function getRowsAndFormat
@@ -63,12 +63,20 @@ function main() {
     return;
   }
 
+  // TODO: we should use checkOutput for uniqueness, since it contains the path to the vuln
+
   const checkOutputIndex = baseFormat.indexOf('Check_Output')
+  // `Trigger_Id` contains the CVE vulnerability id, but since there can be duplicate vulnerabilities
+  // from different places in the code, we can't use this for a uniqueness check
   const triggerIdIndex = baseFormat.indexOf('Trigger_Id')
   const gateActionIndex = baseFormat.indexOf('Gate_Action')
 
   // Find the rows present in the derived image that aren't in the base image
-  const derivedRemainingRows = arraySubtract(derivedRows, baseRows, (row) => `${row[triggerIdIndex]}`)
+  // We use a simple md5 hash to optimize since this row can get quite big
+  const derivedRemainingRows = arraySubtract(derivedRows, baseRows, (row) => {
+    const checkOutput = `${row[checkOutputIndex]}`
+    return crypto.createHash('md5').update(checkOutput).digest('hex')
+  })
 
   //Print out the difference //TODO: format as json if --json is in params?
   console.log(JSON.stringify({
