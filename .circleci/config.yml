@@ -1,0 +1,122 @@
+# CircleCI v2.1 Config
+version: 2.1
+
+##
+# orbs
+#
+# Orbs used in this pipeline
+###
+orbs:
+  anchore: anchore/anchore-engine@1.6.6
+
+##
+# defaults
+#
+# YAML defaults templates, in alphabetical order
+##
+defaults_Dependencies: &defaults_Dependencies |
+  apk --no-cache add git
+  apk --no-cache add ca-certificates
+  apk --no-cache add curl
+  apk --no-cache add openssh-client
+  apk --no-cache add bash
+  apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake
+  npm config set unsafe-perm true
+  npm install -g node-gyp
+
+defaults_awsCliDependencies: &defaults_awsCliDependencies |
+  apk --no-cache add \
+          python \
+          py-pip \
+          groff \
+          less \
+          mailcap
+  pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
+  apk -v --purge del py-pip
+
+##
+# Jobs
+#
+# A map of CircleCI jobs
+# Note: we duplicate them here to ensure CircleCI runs them in parallel
+##
+jobs:
+  image-scan:
+    executor: anchore/anchore_engine
+    steps:
+      - setup_remote_docker
+      - run:
+          name: Install AWS CLI dependencies
+          command: *defaults_awsCliDependencies
+      - run:
+          name: Install nodejs
+          command: apk add --update nodejs npm
+      - attach_workspace:
+          at: /tmp
+      - run:
+          name: Download the mojaloop/ci-config repo
+          command: |
+            git clone https://github.com/mojaloop/ci-config /tmp/ci-config
+            # TODO: remove step once we merge in this feature branch
+            cd /tmp/ci-config && git fetch && git checkout feature/anchore-scanning
+            pwd
+            ls -la
+            # Generate the mojaloop anchore-policy
+            cd /tmp/ci-config/container-scanning && ./mojaloop-policy-generator.js ~/project/.circleci/.anchore/policy_bundle.json
+      - run:
+          name: Pull base image locally
+          command: |
+            docker pull node:12.16.0-alpine
+            docker pull node:12.16.1-alpine
+      - anchore/analyze_local_image:
+          image_name: docker.io/node:12.16.0-alpine docker.io/node:12.16.1-alpine
+          # TODO: is this even respecting this bundle? - maybe this can't be an absolute path
+          policy_bundle_file_path: .circleci/.anchore/policy_bundle.json
+          policy_failure: false
+          timeout: '500'
+      - run:
+          name: Summarize Failures.
+          command: |
+            if [[ ! $(which jq) ]]; then
+              (set +o pipefail; apk add jq || apt-get install -y jq || yum install -y jq)
+            fi
+            if [[ $(ls anchore-reports/*content-os*.json 2> /dev/null) ]]; then
+              printf "\n%s\n" "The following OS packages are installed:"
+              jq '[.content | sort_by(.package) | .[] | {package: .package, version: .version}]' anchore-reports/*content-os*.json
+            fi
+            if [[ $(ls anchore-reports/*vuln*.json 2> /dev/null) ]]; then
+              printf "\n%s\n" "The following vulnerabilities were found:"
+              jq '[.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln]}]' anchore-reports/*vuln*.json
+            fi
+      - run:
+          name: Upload Anchore reports to s3
+          command: |
+            aws s3 cp anchore-reports ${AWS_S3_DIR_ANCHORE_REPORTS}/base_image_scans/ --recursive
+            # aws s3 rm ${AWS_S3_DIR_ANCHORE_REPORTS}/latest/ --recursive --exclude "*" --include "${CIRCLE_PROJECT_REPONAME}*"
+            # aws s3 cp anchore-reports ${AWS_S3_DIR_ANCHORE_REPORTS}/latest/ --recursive
+
+      - store_artifacts:
+          path: anchore-reports
+
+
+workflows:
+  version: 2
+  # Keep the commit job as we can use this to help test the workflow
+  commit:
+    jobs:
+      # Specifying multiple jobs here adds boilerplate, but runs in parallel
+      - image-scan:
+          context: org-global
+      # - image-scan-node-12.16.1-alpine
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - image-scan:
+          context: org-global
+      # - image-scan-node-12.16.1-alpine
