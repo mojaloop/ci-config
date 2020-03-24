@@ -57,11 +57,12 @@ jobs:
           name: Download the mojaloop/ci-config repo
           command: |
             git clone https://github.com/mojaloop/ci-config /tmp/ci-config
+            
             # TODO: remove step once we merge in this feature branch
             cd /tmp/ci-config && git fetch && git checkout feature/anchore-scanning
-            pwd
-            ls -la
+
             # Generate the mojaloop anchore-policy
+            mkdir -p ~/project/.circleci/.anchore
             cd /tmp/ci-config/container-scanning && ./mojaloop-policy-generator.js ~/project/.circleci/.anchore/policy_bundle.json
       - run:
           name: Pull base image locally
@@ -104,10 +105,8 @@ workflows:
   # Keep the commit job as we can use this to help test the workflow
   commit:
     jobs:
-      # Specifying multiple jobs here adds boilerplate, but runs in parallel
       - image-scan:
           context: org-global
-      # - image-scan-node-12.16.1-alpine
   nightly:
     triggers:
       - schedule:
@@ -119,4 +118,3 @@ workflows:
     jobs:
       - image-scan:
           context: org-global
-      # - image-scan-node-12.16.1-alpine
