@@ -6,6 +6,8 @@ To begin with, this will host CircleCI orbs we author and publish, but this coul
 
 ## CircleCI Orb: mojaloop-deployment
 
+CirlceCI orbs are a way to share common config between CircleCI environment. In Mojaloop we use both external orbs in `anchore-cli` and this internally developed orb, `mojaloop-deployment`
+
 download your access token etc: https://circleci.com/docs/2.0/local-cli/#configuring-the-cli
 ```bash
 # setup your env
@@ -19,11 +21,14 @@ version=`cat ./deployment/version`
 circleci orb publish ./deployment/orb.yaml mojaloop/deployment@${version}
 ```
 
-
-
 ### Initial setup notes (this should only be done once)
 
 ```bash 
 circleci namespace create mojaloop github mojaloop #this can only be done once per org
 circleci orb create mojaloop/deployment
 ```
+
+
+## Container Scanning
+
+We use anchore-cli for scanning our docker containers. Under `./container-scanning/` we have a bunch of scripts and config files which help us to evaluate the container scan output and automatically pass or fail our CI/CD pipelines accordingly.

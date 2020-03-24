@@ -1,0 +1,378 @@
+[
+    {
+        "sha256:25019efa41076d538e7608609ea03ac2ab557aebf7774c02c1d05a0cf3b52775": {
+            "localhost:5000/account-lookup-service:v9.2.3": [
+                {
+                    "detail": {
+                        "policy": {
+                            "blacklisted_images": [],
+                            "comment": "Default bundle",
+                            "id": "2c53a13c-1765-11e8-82ef-23527761d060",
+                            "mappings": [
+                                {
+                                    "id": "c4f9bf74-dc38-4ddf-b5cf-00e9c0074611",
+                                    "image": {
+                                        "type": "tag",
+                                        "value": "*"
+                                    },
+                                    "name": "default",
+                                    "policy_id": "48e6f7d6-1765-11e8-b5f9-8b6f228548b6",
+                                    "registry": "*",
+                                    "repository": "*",
+                                    "whitelist_ids": [
+                                        "37fd763e-1765-11e8-add4-3b16c029ac5c"
+                                    ]
+                                }
+                            ],
+                            "name": "Default bundle",
+                            "policies": [
+                                {
+                                    "comment": "System default policy",
+                                    "id": "48e6f7d6-1765-11e8-b5f9-8b6f228548b6",
+                                    "name": "DefaultPolicy",
+                                    "rules": [
+                                        {
+                                            "action": "STOP",
+                                            "gate": "dockerfile",
+                                            "id": "ce7b8000-829b-4c27-8122-69cd59018400",
+                                            "params": [
+                                                {
+                                                    "name": "ports",
+                                                    "value": "22"
+                                                },
+                                                {
+                                                    "name": "type",
+                                                    "value": "blacklist"
+                                                }
+                                            ],
+                                            "trigger": "exposed_ports"
+                                        },
+                                        {
+                                            "action": "WARN",
+                                            "gate": "dockerfile",
+                                            "id": "312d9e41-1c05-4e2f-ad89-b7d34b0855bb",
+                                            "params": [
+                                                {
+                                                    "name": "instruction",
+                                                    "value": "HEALTHCHECK"
+                                                },
+                                                {
+                                                    "name": "check",
+                                                    "value": "not_exists"
+                                                }
+                                            ],
+                                            "trigger": "instruction"
+                                        },
+                                        {
+                                            "action": "WARN",
+                                            "gate": "vulnerabilities",
+                                            "id": "6b5c14e7-a6f7-48cc-99d2-959273a2c6fa",
+                                            "params": [
+                                                {
+                                                    "name": "max_days_since_sync",
+                                                    "value": "2"
+                                                }
+                                            ],
+                                            "trigger": "stale_feed_data"
+                                        },
+                                        {
+                                            "action": "WARN",
+                                            "gate": "vulnerabilities",
+                                            "id": "3e79ea94-18c4-4d26-9e29-3b9172a62c2e",
+                                            "params": [],
+                                            "trigger": "vulnerability_data_unavailable"
+                                        },
+                                        {
+                                            "action": "WARN",
+                                            "gate": "vulnerabilities",
+                                            "id": "6063fdde-b1c5-46af-973a-915739451ac4",
+                                            "params": [
+                                                {
+                                                    "name": "package_type",
+                                                    "value": "all"
+                                                },
+                                                {
+                                                    "name": "severity_comparison",
+                                                    "value": "="
+                                                },
+                                                {
+                                                    "name": "severity",
+                                                    "value": "medium"
+                                                }
+                                            ],
+                                            "trigger": "package"
+                                        },
+                                        {
+                                            "action": "STOP",
+                                            "gate": "vulnerabilities",
+                                            "id": "b30e8abc-444f-45b1-8a37-55be1b8c8bb5",
+                                            "params": [
+                                                {
+                                                    "name": "package_type",
+                                                    "value": "all"
+                                                },
+                                                {
+                                                    "name": "severity_comparison",
+                                                    "value": ">"
+                                                },
+                                                {
+                                                    "name": "severity",
+                                                    "value": "medium"
+                                                }
+                                            ],
+                                            "trigger": "package"
+                                        }
+                                    ],
+                                    "version": "1_0"
+                                }
+                            ],
+                            "version": "1_0",
+                            "whitelisted_images": [],
+                            "whitelists": [
+                                {
+                                    "comment": "Default global whitelist",
+                                    "id": "37fd763e-1765-11e8-add4-3b16c029ac5c",
+                                    "items": [],
+                                    "name": "Global Whitelist",
+                                    "version": "1_0"
+                                }
+                            ]
+                        },
+                        "result": {
+                            "bundle": {
+                                "blacklisted_images": [],
+                                "comment": "Default bundle",
+                                "id": "2c53a13c-1765-11e8-82ef-23527761d060",
+                                "mappings": [
+                                    {
+                                        "id": "c4f9bf74-dc38-4ddf-b5cf-00e9c0074611",
+                                        "image": {
+                                            "type": "tag",
+                                            "value": "*"
+                                        },
+                                        "name": "default",
+                                        "policy_id": "48e6f7d6-1765-11e8-b5f9-8b6f228548b6",
+                                        "registry": "*",
+                                        "repository": "*",
+                                        "whitelist_ids": [
+                                            "37fd763e-1765-11e8-add4-3b16c029ac5c"
+                                        ]
+                                    }
+                                ],
+                                "name": "Default bundle",
+                                "policies": [
+                                    {
+                                        "comment": "System default policy",
+                                        "id": "48e6f7d6-1765-11e8-b5f9-8b6f228548b6",
+                                        "name": "DefaultPolicy",
+                                        "rules": [
+                                            {
+                                                "action": "STOP",
+                                                "gate": "dockerfile",
+                                                "id": "ce7b8000-829b-4c27-8122-69cd59018400",
+                                                "params": [
+                                                    {
+                                                        "name": "ports",
+                                                        "value": "22"
+                                                    },
+                                                    {
+                                                        "name": "type",
+                                                        "value": "blacklist"
+                                                    }
+                                                ],
+                                                "trigger": "exposed_ports"
+                                            },
+                                            {
+                                                "action": "WARN",
+                                                "gate": "dockerfile",
+                                                "id": "312d9e41-1c05-4e2f-ad89-b7d34b0855bb",
+                                                "params": [
+                                                    {
+                                                        "name": "instruction",
+                                                        "value": "HEALTHCHECK"
+                                                    },
+                                                    {
+                                                        "name": "check",
+                                                        "value": "not_exists"
+                                                    }
+                                                ],
+                                                "trigger": "instruction"
+                                            },
+                                            {
+                                                "action": "WARN",
+                                                "gate": "vulnerabilities",
+                                                "id": "6b5c14e7-a6f7-48cc-99d2-959273a2c6fa",
+                                                "params": [
+                                                    {
+                                                        "name": "max_days_since_sync",
+                                                        "value": "2"
+                                                    }
+                                                ],
+                                                "trigger": "stale_feed_data"
+                                            },
+                                            {
+                                                "action": "WARN",
+                                                "gate": "vulnerabilities",
+                                                "id": "3e79ea94-18c4-4d26-9e29-3b9172a62c2e",
+                                                "params": [],
+                                                "trigger": "vulnerability_data_unavailable"
+                                            },
+                                            {
+                                                "action": "WARN",
+                                                "gate": "vulnerabilities",
+                                                "id": "6063fdde-b1c5-46af-973a-915739451ac4",
+                                                "params": [
+                                                    {
+                                                        "name": "package_type",
+                                                        "value": "all"
+                                                    },
+                                                    {
+                                                        "name": "severity_comparison",
+                                                        "value": "="
+                                                    },
+                                                    {
+                                                        "name": "severity",
+                                                        "value": "medium"
+                                                    }
+                                                ],
+                                                "trigger": "package"
+                                            },
+                                            {
+                                                "action": "STOP",
+                                                "gate": "vulnerabilities",
+                                                "id": "b30e8abc-444f-45b1-8a37-55be1b8c8bb5",
+                                                "params": [
+                                                    {
+                                                        "name": "package_type",
+                                                        "value": "all"
+                                                    },
+                                                    {
+                                                        "name": "severity_comparison",
+                                                        "value": ">"
+                                                    },
+                                                    {
+                                                        "name": "severity",
+                                                        "value": "medium"
+                                                    }
+                                                ],
+                                                "trigger": "package"
+                                            }
+                                        ],
+                                        "version": "1_0"
+                                    }
+                                ],
+                                "version": "1_0",
+                                "whitelisted_images": [],
+                                "whitelists": [
+                                    {
+                                        "comment": "Default global whitelist",
+                                        "id": "37fd763e-1765-11e8-add4-3b16c029ac5c",
+                                        "items": [],
+                                        "name": "Global Whitelist",
+                                        "version": "1_0"
+                                    }
+                                ]
+                            },
+                            "created_at": 1582819703,
+                            "evaluation_problems": [],
+                            "final_action": "warn",
+                            "final_action_reason": "policy_evaluation",
+                            "image_id": "6f102056c09791caede44eefc0f630eac62a4a599482f39f840d8db121674dbb",
+                            "last_modified": 1582819703,
+                            "matched_blacklisted_images_rule": false,
+                            "matched_mapping_rule": {
+                                "id": "c4f9bf74-dc38-4ddf-b5cf-00e9c0074611",
+                                "image": {
+                                    "type": "tag",
+                                    "value": "*"
+                                },
+                                "name": "default",
+                                "policy_id": "48e6f7d6-1765-11e8-b5f9-8b6f228548b6",
+                                "registry": "*",
+                                "repository": "*",
+                                "whitelist_ids": [
+                                    "37fd763e-1765-11e8-add4-3b16c029ac5c"
+                                ]
+                            },
+                            "matched_whitelisted_images_rule": false,
+                            "result": {
+                                "6f102056c09791caede44eefc0f630eac62a4a599482f39f840d8db121674dbb": {
+                                    "result": {
+                                        "final_action": "warn",
+                                        "header": [
+                                            "Image_Id",
+                                            "Repo_Tag",
+                                            "Trigger_Id",
+                                            "Gate",
+                                            "Trigger",
+                                            "Check_Output",
+                                            "Gate_Action",
+                                            "Whitelisted",
+                                            "Policy_Id"
+                                        ],
+                                        "row_count": 4,
+                                        "rows": [
+                                            [
+                                                "6f102056c09791caede44eefc0f630eac62a4a599482f39f840d8db121674dbb",
+                                                "localhost:5000/account-lookup-service:v9.2.3",
+                                                "41cb7cdf04850e33a11f80c42bf660b3",
+                                                "dockerfile",
+                                                "instruction",
+                                                "Dockerfile directive 'HEALTHCHECK' not found, matching condition 'not_exists' check",
+                                                "stop",
+                                                false,
+                                                "48e6f7d6-1765-11e8-b5f9-8b6f228548b6"
+                                            ],
+                                            [
+                                                "6f102056c09791caede44eefc0f630eac62a4a599482f39f840d8db121674dbb",
+                                                "localhost:5000/account-lookup-service:v9.2.3",
+                                                "deb3f1afb4ea0ddf587e6c62c341c6fa",
+                                                "vulnerabilities",
+                                                "stale_feed_data",
+                                                "The vulnerability feed for this image distro is older than MAXAGE (2) days",
+                                                "stop",
+                                                false,
+                                                "48e6f7d6-1765-11e8-b5f9-8b6f228548b6"
+                                            ],
+                                            [
+                                                "6f102056c09791caede44eefc0f630eac62a4a599482f39f840d8db121674dbb",
+                                                "localhost:5000/account-lookup-service:v9.2.3",
+                                                "7de2e0151d3174085bf5607da8dd13cb",
+                                                "vulnerabilities",
+                                                "vulnerability_data_unavailable",
+                                                "Feed data unavailable, cannot perform CVE scan for distro: alpine:3.11.3",
+                                                "warn",
+                                                false,
+                                                "48e6f7d6-1765-11e8-b5f9-8b6f228548b6"
+                                            ],
+                                            [
+                                                "6f102056c09791caede44eefc0f630eac62a4a599482f39f840d8db121674dbb",
+                                                "localhost:5000/account-lookup-service:v9.2.3",
+                                                "CVE-2019-20149+kind-of",
+                                                "vulnerabilities",
+                                                "package",
+                                                "MEDIUM Vulnerability found in non-os package type (npm) - /opt/account-lookup-service/node_modules/kind-of/package.json (CVE-2019-20149 - https://nvd.nist.gov/vuln/detail/CVE-2019-20149)",
+                                                "warn",
+                                                false,
+                                                "48e6f7d6-1765-11e8-b5f9-8b6f228548b6"
+                                            ]
+                                        ]
+                                    }
+                                },
+                                "policy_data": [],
+                                "policy_name": "",
+                                "whitelist_data": [],
+                                "whitelist_names": []
+                            },
+                            "tag": "localhost:5000/account-lookup-service:v9.2.3",
+                            "user_id": "admin"
+                        }
+                    },
+                    "last_evaluation": "2020-02-27T16:08:23Z",
+                    "policyId": "2c53a13c-1765-11e8-82ef-23527761d060",
+                    "status": "pass"
+                }
+            ]
+        }
+    }
+]

@@ -1,0 +1,58 @@
+{
+  "id": "mojaloop-default",
+  "name": "anchore_cis_1.13.0_base",
+  "version": "0_1_0",
+  "description": "Docker CIS 1.13.0 image content checks, from section 4 and 5. NOTE: some parameters (generally are named 'example...') must be modified as they require site-specific settings",
+  "last_updated": 1585011234,
+  "blacklisted_images": [],
+  "mappings": [
+    {
+      "comment": "default mapping that matches all registry/repo:tag images",
+      "id": "042d5b75-ed9d-4fb7-8d41-ec174102f696",
+      "image": {
+        "type": "tag",
+        "value": "*"
+      },
+      "name": "default",
+      "policy_ids": [
+        "4f3bdc23-175b-4582-8c7d-3a7d8fa32a12",
+        "cb417967-266b-4453-bfb6-9acf67b0bee5",
+        "f2de1d56-c7f1-4b5a-92e0-135a27feae45"
+      ],
+      "registry": "*",
+      "repository": "*",
+      "whitelist_ids": [
+        "13f4c9fe-e86c-4b07-94fd-57fd086f1ff6",
+        "add5d172-775c-461a-842e-41c87af671dc"
+      ]
+    }
+  ],
+  "policies": [
+    {
+      "comment": "Docker CIS section 4.8 and 4.10 checks.",
+      "id": "f2de1d56-c7f1-4b5a-92e0-135a27feae45",
+      "name": "CIS File Checks",
+      "rules": [
+        {
+          "action": "WARN",
+          "comment": "section 4.8",
+          "gate": "files",
+          "id": "41b657bb-86e5-43ba-8f35-18edc3a465f9",
+          "params": [],
+          "trigger": "suid_or_guid_set"
+        },
+        {
+          "action": "WARN",
+          "comment": "section 4.10",
+          "gate": "secret_scans",
+          "id": "c0e5e302-764d-4b19-9fbd-5c7b0b558673",
+          "params": [],
+          "trigger": "content_regex_checks"
+        }
+      ],
+      "version": "1_0"
+    }
+  ],
+  "whitelisted_images": [],
+  "whitelists": []
+}
