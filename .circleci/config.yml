@@ -65,7 +65,7 @@ jobs:
             mkdir -p ~/project/.circleci/.anchore
             cd /tmp/ci-config/container-scanning && ./mojaloop-policy-generator.js ~/project/.circleci/.anchore/policy_bundle.json
       - run:
-          name: Pull base image locally
+          name: Pull base images locally
           command: |
             docker pull node:12.16.0-alpine
             docker pull node:12.16.1-alpine
