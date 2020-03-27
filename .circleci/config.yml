@@ -92,7 +92,7 @@ jobs:
       - run:
           name: Upload Anchore reports to s3
           command: |
-            aws s3 cp anchore-reports ${AWS_S3_DIR_ANCHORE_REPORTS}/base_image_scans/ --recursive
+            aws s3 cp anchore-reports ${AWS_S3_DIR_ANCHORE_REPORTS}/base-image-scans/ --recursive
             # aws s3 rm ${AWS_S3_DIR_ANCHORE_REPORTS}/latest/ --recursive --exclude "*" --include "${CIRCLE_PROJECT_REPONAME}*"
             # aws s3 cp anchore-reports ${AWS_S3_DIR_ANCHORE_REPORTS}/latest/ --recursive
 
