@@ -9,6 +9,7 @@ set -o nounset
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ANCHORE_URL="http://localhost:8228"
 INLINE_SCAN_IMAGE="${INLINE_SCAN_IMAGE:-docker.io/anchore/inline-scan:v0.6.1}"
+DOCKER_NAME="inline-anchore-engine"
 
 # ANCHORE_USER="admin"
 # ANCHORE_PASS="foobar"
@@ -22,6 +23,11 @@ POLICY_NAME="${POLICY_NAME:-default_policy}"
 # WORKING_DIR="${WORKING_DIR:-/tmp/test-ci-config}"
 WORKING_DIR="${WORKING_DIR:-/tmp/ci-config}"
 
+CREATE_CMD=()
+RUN_CMD=()
+COPY_CMDS=()
+DOCKER_ID=""
+
 
 
 main() {
@@ -30,6 +36,12 @@ main() {
   mkdir -p ${RESULT_DIR}
   
   prepare_inline_container
+  docker ps -a
+
+  CREATE_CMD+=('scan')
+  RUN_CMD+=('scan')
+  start_vuln_scan
+
 
 }
 
@@ -74,6 +86,46 @@ prepare_inline_container() {
 
     CREATE_CMD+=('"${INLINE_SCAN_IMAGE}"')
     RUN_CMD+=('"${INLINE_SCAN_IMAGE}"')
+}
+
+start_vuln_scan() {
+    # if [[ "${f_flag}" ]]; then
+    #     CREATE_CMD+=('-f')
+    #     RUN_CMD+=('-f')
+    # fi
+    # if [[ "${r_flag}" ]]; then
+    #     CREATE_CMD+=('-r')
+    #     RUN_CMD+=('-r')
+    # fi
+
+    # If no files need to be copied to container, pipe docker save output to stdin of docker run command.
+    # if [[ ! "${d_flag}" ]] && [[ ! "${b_flag}" ]] && [[ "${#SCAN_IMAGES[@]}" -eq 1 ]]; then
+    #     RUN_CMD+=('-i "${SCAN_IMAGES[*]}"')
+
+    #     # If image is passed without a tag, append :latest to docker save to prevent skopeo manifest error
+    #     if [[ ! "${SCAN_IMAGES[*]}" =~ [:]+ ]]; then
+    #         docker save "${SCAN_IMAGES[*]}:latest" | eval "${RUN_CMD[*]}"
+    #     else
+    #         docker save "${SCAN_IMAGES[*]}" | eval "${RUN_CMD[*]}"
+    #     fi
+    # else
+        # Prepare commands for container creation & copying all files to container.
+    # if [[ "${b_flag}" ]]; then
+    CREATE_CMD+=('-b "${POLICY_BUNDLE}"')
+    COPY_CMDS+=('docker cp "${POLICY_BUNDLE}" "${DOCKER_NAME}:/anchore-engine/$(basename ${POLICY_BUNDLE})";')
+    # fi
+
+    # if [[ "${d_flag}" ]] && [[ "${#SCAN_IMAGES[@]}" -eq 1 ]]; then
+    #     CREATE_CMD+=('-d "${DOCKERFILE}" -i "${SCAN_IMAGES[*]}"')
+    #     COPY_CMDS+=('docker cp "${DOCKERFILE}" "${DOCKER_NAME}:/anchore-engine/$(basename ${DOCKERFILE})";')
+    # fi
+
+    DOCKER_ID=$(eval "${CREATE_CMD[*]}")
+    eval "${COPY_CMDS[*]}"
+    save_and_copy_images
+    echo
+    docker start -ia "${DOCKER_NAME}"
+    # fi
 }
 
 
