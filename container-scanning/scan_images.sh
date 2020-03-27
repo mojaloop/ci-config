@@ -17,7 +17,15 @@ ANCHORE_CLI_PASS=foobar
 RESULT_DIR="${RESULT_DIR:-/tmp/anchore_results/}"
 POLICY_BUNDLE="${POLICY_BUNDLE:-./policy_bundle.json}"
 POLICY_NAME="${POLICY_NAME:-default_policy}"
+# WORKING_DIR="${WORKING_DIR:-/tmp/test-ci-config}"
+WORKING_DIR="${WORKING_DIR:-/tmp/ci-config}"
 
+
+mkdir -p ${WORKING_DIR}
+cd ${WORKING_DIR}
+pwd
+mkdir -p ${RESULT_DIR}
+pwd
 
 ### Testing out as a replacement to the broken Anchore CLI Orb
 
@@ -33,11 +41,12 @@ docker create --name ae docker.io/anchore/anchore-engine:latest
 docker cp ae:/docker-compose.yaml ./docker-compose.yaml
 docker rm ae
 
+pwd
+
 docker-compose pull
 docker-compose up
 docker-compose ps
 
-mkdir -p ${RESULT_DIR}
 
 ## Configure Anchore Policies
 anchore-cli policy add ${POLICY_BUNDLE}
