@@ -32,3 +32,22 @@ circleci orb create mojaloop/deployment
 ## Container Scanning
 
 We use anchore-cli for scanning our docker containers. Under `./container-scanning/` we have a bunch of scripts and config files which help us to evaluate the container scan output and automatically pass or fail our CI/CD pipelines accordingly.
+
+
+### Debugging container scans:
+
+Still getting this issue
+
+```
+Error: Policy bundle null not found in DB
+HTTP Code: 404
+Detail: {'error_codes': []}
+
+
+Unable to activate policy bundle - /anchore-engine/policy.json -- using default policy bundle.
+
+```
+
+
+So it looks like this issue is with the actual inline image itself...
+Let's see if we can hack it 
