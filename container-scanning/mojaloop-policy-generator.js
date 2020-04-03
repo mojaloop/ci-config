@@ -53,9 +53,9 @@ const policy = {
       },
       "name": "default",
       "policy_ids": [
-        "4f3bdc23-175b-4582-8c7d-3a7d8fa32a12",
+        // "4f3bdc23-175b-4582-8c7d-3a7d8fa32a12",
         // "cb417967-266b-4453-bfb6-9acf67b0bee5",
-        // "f2de1d56-c7f1-4b5a-92e0-135a27feae45"
+        "f2de1d56-c7f1-4b5a-92e0-135a27feae45"
       ],
       "registry": "*",
       "repository": "*",
