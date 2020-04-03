@@ -12,7 +12,9 @@
         "value": "*"
       },
       "name": "default",
-      "policy_ids": [],
+      "policy_ids": [
+        "f2de1d56-c7f1-4b5a-92e0-135a27feae45"
+      ],
       "registry": "*",
       "repository": "*",
       "whitelist_ids": [
@@ -23,6 +25,30 @@
   ],
   "name": "mojaloop_default",
   "policies": [
+    {
+      "comment": "Docker CIS section 4.8 and 4.10 checks.",
+      "id": "f2de1d56-c7f1-4b5a-92e0-135a27feae45",
+      "name": "CIS File Checks",
+      "rules": [
+        {
+          "action": "WARN",
+          "comment": "section 4.8",
+          "gate": "files",
+          "id": "41b657bb-86e5-43ba-8f35-18edc3a465f9",
+          "params": [],
+          "trigger": "suid_or_guid_set"
+        },
+        {
+          "action": "WARN",
+          "comment": "section 4.10",
+          "gate": "secret_scans",
+          "id": "c0e5e302-764d-4b19-9fbd-5c7b0b558673",
+          "params": [],
+          "trigger": "content_regex_checks"
+        }
+      ],
+      "version": "1_0"
+    }
   ],
   "version": "1_0",
   "whitelisted_images": [],
