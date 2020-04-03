@@ -87,6 +87,16 @@ IMAGE_NAME="docker.io/node:12.16.0-alpine"
 curl -s https://ci-tools.anchore.io/inline_scan-${ANCHORE_VERSION} > /tmp/inline-scan.sh
 
 bash /tmp/inline-scan.sh -r -t 500 -b ${POLICY_BUNDLE_PATH} ${IMAGE_NAME} > /tmp/output
+
+
+
+#newer:
+POLICY_BUNDLE_PATH="/tmp/mojaloop-policy.json"
+IMAGE_NAME="docker.io/node:12.16.0-alpine"
+cd /tmp/ci-config/container-scanning
+git pull && ./mojaloop-policy-generator.js ${POLICY_BUNDLE_PATH}
+bash /tmp/inline-scan.sh -r -t 500 -b ${POLICY_BUNDLE_PATH} ${IMAGE_NAME} > /tmp/output
+
 ```
 
 What have we learned:
