@@ -32,6 +32,64 @@ if (process.argv.length !== 3) {
 const outputPath = process.argv[2]
 console.log(`Exporting policy path: ${outputPath}`)
 
+
+/**
+ * @function similarArrays
+ * @description Are the arrays similar? Uses length, and then iterates 
+ *  through 1 array to perform lookup.
+ *  
+ *  1. if the lengths are different, returns false
+ *  2. if arr2 contains something (using === equals) not in arr1, returns false
+ *  3. Otherwise, returns true (it doesn't care about ordering)
+ * 
+ * @param {*} arr1 
+ * @param {*} arr2 
+ */
+function similarArrays(arr1, arr2) {
+  if (arr1.length !== arr2.length) {
+    return false
+  }
+
+  return arr2.reduce((acc, curr) => acc && arr1.indexOf(curr) !== -1, true)
+}
+
+/**
+ * @function validatePolicyTemplate
+ * 
+ * @description Validates the policy template based on the following rules:
+ *  1. The top level `mappings.policy_ids` and `mappings.whitelist_ids` are important,
+ *     they must match the ids in the respective `policies` and `whitelists` map
+ *  2. You must have AT LEAST ONE policy in the policies map
+ *  3. There is no lower limit to the whitelists
+ * 
+ * @param {*} template  - The policy template
+ */
+function validatePolicyTemplate(template) {
+  if (!template.mappings || template.mappings.length === 0) {
+    throw new Error('policy.mappings not found. This is required')
+  }
+
+  const { policy_ids, whitelist_ids } = template.mappings[0];
+  if (!policy_ids || policy_ids.length === 0) {
+    throw new Error('policy.mappings.policy_ids is required, and must have at least 1 entry')
+  }
+
+  if (!whitelist_ids) {
+    throw new Error('policy.whitelist_ids is required.')
+  }
+  
+  const foundPolicyIds = template.policies.map(p => p.id)
+  const foundWhitelistIds = template.whitelists.map(p => p.id)
+
+  if (!similarArrays(policy_ids, foundPolicyIds)) {
+    throw new Error('`policy.mappings.policy_ids` must be equal to ids in `policy.policies` Array')
+  }
+
+  if (!similarArrays(whitelist_ids, foundWhitelistIds)) {
+    throw new Error('`policy.mappings.whitelist_ids` must be equal to ids in `policy.whitelists` Array')
+  }
+}
+
 /**
  * Edit the policy inline here.
  * Based off of the Docker CIS 1.13.0 best practices
@@ -646,4 +704,5 @@ const policy = {
   ]
 };
 
+validatePolicyTemplate(policy)
 fs.writeFileSync(outputPath, Buffer.from(JSON.stringify(policy, null, 2)))
