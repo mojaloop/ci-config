@@ -12,6 +12,16 @@ const fs = require('fs')
  *    ./mojaloop-policy-generator.js /tmp/mojaloop-policy.json
  * 
  * We keep this in a .js file as it allows us to better manage the complicated policy file with comments, etc 
+ * 
+ * 
+ *  Tips for writing a valid file (anchore has no easy policy checker, so if this 
+ *  file is written incorrectly, it will simply fail and default to the default
+ *  policy file
+ * 
+ *  1. The top level `mappings.policy_ids` and `mappings.whitelist_ids` are important, 
+ *     they must match the ids in the respective `policies` and `whitelists` map
+ *  2. You must have AT LEAST ONE policy in the policies map
+ *  3. There is no lower limit to the whitelists
  */
 
 if (process.argv.length !== 3) {
@@ -28,9 +38,9 @@ console.log(`Exporting policy path: ${outputPath}`)
  */
 const policy = {
   id: 'mojaloop-default',
-  name: "anchore_cis_1.13.0_base",
-  version: "0_1_0",
-  description: "Docker CIS 1.13.0 image content checks, from section 4 and 5. NOTE: some parameters (generally are named 'example...') must be modified as they require site-specific settings",
+  name: "mojaloop-default",
+  version: "1_0",
+  description: "Mojaloop default Anchore policy, based on the Docker CIS 1.13.0 image content checks.",
   last_updated: Math.floor((new Date()).getTime()/1000),
   blacklisted_images: [],
   mappings: [
@@ -44,14 +54,14 @@ const policy = {
       "name": "default",
       "policy_ids": [
         "4f3bdc23-175b-4582-8c7d-3a7d8fa32a12",
-        "cb417967-266b-4453-bfb6-9acf67b0bee5",
-        "f2de1d56-c7f1-4b5a-92e0-135a27feae45"
+        // "cb417967-266b-4453-bfb6-9acf67b0bee5",
+        // "f2de1d56-c7f1-4b5a-92e0-135a27feae45"
       ],
       "registry": "*",
       "repository": "*",
       "whitelist_ids": [
-        "13f4c9fe-e86c-4b07-94fd-57fd086f1ff6",
-        "add5d172-775c-461a-842e-41c87af671dc"
+        // "13f4c9fe-e86c-4b07-94fd-57fd086f1ff6",
+        // "add5d172-775c-461a-842e-41c87af671dc"
       ]
     }
   ],

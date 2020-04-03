@@ -88,5 +88,7 @@ bash /tmp/inline-scan.sh -r -t 500 -b ${POLICY_BUNDLE_PATH} ${IMAGE_NAME}
 ```
 
 What have we learned:
-- ids in the root mappings object are important
-- need at least 1 policy id, not sure about whitelists...
+- ids in the root mappings object are important, they must match
+- need at least 1 policy id
+- no lower limit on whitelists
+
