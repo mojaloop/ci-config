@@ -51,3 +51,37 @@ Unable to activate policy bundle - /anchore-engine/policy.json -- using default 
 
 So it looks like this issue is with the actual inline image itself...
 Let's see if we can hack it 
+
+
+
+## Test run command:
+
+POLICY_FAILURE="false"
+ANCHORE_VERSION="v0.6.1"
+TIMEOUT=500
+POLICY_BUNDLE_PATH="${HOME}/project/.circleci/.anchore/policy_bundle.json"
+DOCKERFILE_PATH=""
+IMAGE_NAME="docker.io/node:12.16.0-alpine ${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"
+run_cmd="curl -s https://ci-tools.anchore.io/inline_scan-${ANCHORE_VERSION} | bash -s -- -r -t $TIMEOUT"
+
+if [[ ! -z $POLICY_BUNDLE_PATH ]] && [[ -f $POLICY_BUNDLE_PATH ]]; then
+  run_cmd="$run_cmd -b $POLICY_BUNDLE_PATH"
+else
+  echo "ERROR - could not find policy bundle $POLICY_BUNDLE_PATH - using default policy bundle."
+fi
+if [[ ! -z $DOCKERFILE_PATH ]] && [[ -f $DOCKERFILE_PATH ]]; then
+  run_cmd="$run_cmd -d $DOCKERFILE_PATH"
+else
+  echo "ERROR - could not find Dockerfile $DOCKERFILE_PATH - Dockerfile not included in scan."
+fi
+run_cmd="$run_cmd $IMAGE_NAME"
+eval "$run_cmd"
+
+
+ANCHORE_VERSION="v0.6.1"
+IMAGE_NAME="docker.io/node:12.16.0-alpine ${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"
+curl -s https://ci-tools.anchore.io/inline_scan-${ANCHORE_VERSION} > /tmp/inline-scan.sh
+
+bash /tmp/inline-scan.sh -r -t ${TIMEOUT}  -b ${POLICY_BUNDLE_PATH} 
+
+
