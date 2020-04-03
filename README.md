@@ -85,5 +85,8 @@ IMAGE_NAME="docker.io/node:12.16.0-alpine ${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAM
 curl -s https://ci-tools.anchore.io/inline_scan-${ANCHORE_VERSION} > /tmp/inline-scan.sh
 
 bash /tmp/inline-scan.sh -r -t 500 -b ${POLICY_BUNDLE_PATH} ${IMAGE_NAME}
-
 ```
+
+What have we learned:
+- ids in the root mappings object are important
+- need at least 1 policy id, not sure about whitelists...
