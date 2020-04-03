@@ -55,7 +55,7 @@ Let's see if we can hack it
 
 
 ## Test run command:
-
+```bash
 POLICY_FAILURE="false"
 ANCHORE_VERSION="v0.6.1"
 TIMEOUT=500
@@ -79,9 +79,11 @@ eval "$run_cmd"
 
 
 ANCHORE_VERSION="v0.6.1"
+# POLICY_BUNDLE_PATH="${HOME}/project/.circleci/.anchore/policy_bundle.json"
+POLICY_BUNDLE_PATH="/tmp/ci-config/container-scanning/test_policy.json"
 IMAGE_NAME="docker.io/node:12.16.0-alpine ${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"
 curl -s https://ci-tools.anchore.io/inline_scan-${ANCHORE_VERSION} > /tmp/inline-scan.sh
 
-bash /tmp/inline-scan.sh -r -t ${TIMEOUT}  -b ${POLICY_BUNDLE_PATH} 
+bash /tmp/inline-scan.sh -r -t 500 -b ${POLICY_BUNDLE_PATH} ${IMAGE_NAME}
 
-
+```
