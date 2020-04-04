@@ -102,41 +102,99 @@ const policy = {
   last_updated: Math.floor((new Date()).getTime()/1000),
   blacklisted_images: [],
   mappings: [
+    // Apply for all `mojaloop/*` derived images
     {
-      "comment": "default mapping that matches all registry/repo:tag images",
-      "id": "042d5b75-ed9d-4fb7-8d41-ec174102f696",
-      "image": {
-        "type": "tag",
-        "value": "*"
+      comment: 'mapping that matches mojaloop images',
+      id: 'mapping-mojaloop',
+      registry: '*',
+      repository: 'mojaloop',
+      image: {
+        type: 'tag',
+        value: '*',
       },
-      "name": "default",
-      "policy_ids": [
-        "cis_file_checks",
-        "4f3bdc23-175b-4582-8c7d-3a7d8fa32a12",
-        "cb417967-266b-4453-bfb6-9acf67b0bee5",
+      name: 'mapping-mojaloop',
+      policy_ids: [
+        'dockerfile_checks',
+        'cis_file_checks',
+        '4f3bdc23-175b-4582-8c7d-3a7d8fa32a12',
+        'cb417967-266b-4453-bfb6-9acf67b0bee5',
       ],
-      "registry": "*",
-      "repository": "*",
-      "whitelist_ids": [
+      whitelist_ids: [
+        'alpine-sgid-whitelist',
+        // "13f4c9fe-e86c-4b07-94fd-57fd086f1ff6",
+        // "add5d172-775c-461a-842e-41c87af671dc"
+      ]
+    },
+    {
+      comment: 'default mapping that matches all registry/repo:tag images',
+      id: 'mapping-default',
+      registry: '*',
+      repository: '*',
+      image: {
+        type: 'tag',
+        value: '*',
+      },
+      name: 'mapping-default',
+      policy_ids: [
+        'cis_file_checks',
+        '4f3bdc23-175b-4582-8c7d-3a7d8fa32a12',
+        'cb417967-266b-4453-bfb6-9acf67b0bee5',
+      ],
+      whitelist_ids: [
+        'alpine-sgid-whitelist',
         // "13f4c9fe-e86c-4b07-94fd-57fd086f1ff6",
         // "add5d172-775c-461a-842e-41c87af671dc"
       ]
     }
   ],
+  /*
+    Refer to the following Anchore docs to understand these policies:
+    https://docs.anchore.com/current/docs/overview/concepts/policy/policy_checks/
+
+
+    ideas:
+
+    4.1 - It is a good practice to run the container as a non-root user, if possible. Though user namespace mapping is now available, if a user is already defined in the container image, the container is run as that user by default and specific user namespace remapping is not required. Create a non-root user for the container in the Dockerfile for the container image
+    4.6 - One of the important security triads is availability. Adding HEALTHCHECK instruction to your container image ensures that the docker engine periodically checks the running container instances against that instruction to ensure that the instances are still working. Based on the reported health status, the docker engine could then exit non-working containers and instantiate new ones. Add HEALTHCHECK instruction in your docker container images to perform the health check on running containers.
+    4.8 - setuid and setgid permissions could be used for elevating privileges. While these permissions are at times legitimately needed, these could potentially be used in privilege escalation attacks. Thus, you should consider dropping these permissions for the packages which do not need them within the images.
+    4.10  - Ensure secrets are not stored in Dockerfiles
+    5.8  - Ensure that only needed ports are open on the container
+
+  */
   policies: [
     {
-      comment: "Docker CIS section 4.8 and 4.10 checks.",
-      id: "cis_file_checks",
-      name: "CIS File Checks",
+      id: 'dockerfile_checks',
+      name: 'Dockerfile Checks',
+      comment: 'Dockerfile checks, based on CIS benchmark and best practices',
+      version: '1_0',
       rules: [
         {
-          "action": "WARN",
-          "comment": "section 4.8",
-          "gate": "files",
-          "id": "41b657bb-86e5-43ba-8f35-18edc3a465f9",
-          "params": [],
-          "trigger": "suid_or_guid_set"
-        },
+          action: "STOP",
+          comment: "dockerfile not set",
+          gate: 'dockerfile',
+          id: 'dockerfile_checks_dockerfile',
+          params: [],
+          trigger: 'no_dockerfile_provided',
+        }
+      ]
+    },
+    {
+      id: "cis_file_checks",
+      name: "CIS File Checks",
+      comment: "Docker CIS section 4.8 and 4.10 checks.",
+      version: '1_0',
+      rules: [
+        // Disabled this rule temporarily
+        // The only way to whitelist this is manually for EACH file, not
+        // based on directory, so we will leave it for now
+        // {
+        //   "action": "WARN",
+        //   "comment": "section 4.8",
+        //   "gate": "files",
+        //   "id": "41b657bb-86e5-43ba-8f35-18edc3a465f9",
+        //   "params": [],
+        //   "trigger": "suid_or_guid_set"
+        // },
         {
           "action": "WARN",
           "comment": "section 4.10",
@@ -148,7 +206,6 @@ const policy = {
       ],
       version: "1_0"
     },
-
     {
       "comment": "Docker CIS section 4.1, 4.2, 4.6, 4.7, 4.9 and 5.8 checks.",
       "id": "cb417967-266b-4453-bfb6-9acf67b0bee5",
@@ -172,86 +229,86 @@ const policy = {
       //     ],
       //     "trigger": "exposed_ports"
       //   },
-      //   {
-      //     "action": "WARN",
-      //     "comment": "section",
-      //     "gate": "dockerfile",
-      //     "id": "e9eacc50-aaac-4241-95ac-790cf0be84da",
-      //     "params": [
-      //       {
-      //         "name": "instruction",
-      //         "value": "ADD"
-      //       },
-      //       {
-      //         "name": "check",
-      //         "value": "exists"
-      //       }
-      //     ],
-      //     "trigger": "instruction"
-      //   },
-      //   {
-      //     "action": "WARN",
-      //     "comment": "section 4.7",
-      //     "gate": "dockerfile",
-      //     "id": "2f87d4bf-e963-496a-8b3d-ff90bef46014",
-      //     "params": [
-      //       {
-      //         "name": "instruction",
-      //         "value": "RUN"
-      //       },
-      //       {
-      //         "name": "check",
-      //         "value": "like"
-      //       },
-      //       {
-      //         "name": "value",
-      //         "value": "(\\s*/bin/sh\\s*-c\\s*)*\\s*apk.*up(date|grade)\\s*$"
-      //       }
-      //     ],
-      //     "trigger": "instruction"
-      //   },
-      //   {
-      //     "action": "WARN",
-      //     "comment": "section 4.7",
-      //     "gate": "dockerfile",
-      //     "id": "ea1b1c11-0633-48cc-8afc-92b252f331b3",
-      //     "params": [
-      //       {
-      //         "name": "instruction",
-      //         "value": "RUN"
-      //       },
-      //       {
-      //         "name": "check",
-      //         "value": "like"
-      //       },
-      //       {
-      //         "name": "value",
-      //         "value": "(\\s*/bin/sh\\s*-c\\s*)*\\s*yum.*up(date|grade)\\s*$"
-      //       }
-      //     ],
-      //     "trigger": "instruction"
-      //   },
-      //   {
-      //     "action": "WARN",
-      //     "comment": "section 4.7",
-      //     "gate": "dockerfile",
-      //     "id": "c5dbe7b8-b48b-4845-beff-069421d9d1ba",
-      //     "params": [
-      //       {
-      //         "name": "instruction",
-      //         "value": "RUN"
-      //       },
-      //       {
-      //         "name": "check",
-      //         "value": "like"
-      //       },
-      //       {
-      //         "name": "value",
-      //         "value": "(\\s*/bin/sh\\s*-c\\s*)*\\s*apt(-get)*.*up(date|grade)\\s*$"
-      //       }
-      //     ],
-      //     "trigger": "instruction"
-      //   },
+        {
+          "action": "WARN",
+          "comment": "section",
+          "gate": "dockerfile",
+          "id": "e9eacc50-aaac-4241-95ac-790cf0be84da",
+          "params": [
+            {
+              "name": "instruction",
+              "value": "ADD"
+            },
+            {
+              "name": "check",
+              "value": "exists"
+            }
+          ],
+          "trigger": "instruction"
+        },
+        {
+          "action": "WARN",
+          "comment": "section 4.7",
+          "gate": "dockerfile",
+          "id": "2f87d4bf-e963-496a-8b3d-ff90bef46014",
+          "params": [
+            {
+              "name": "instruction",
+              "value": "RUN"
+            },
+            {
+              "name": "check",
+              "value": "like"
+            },
+            {
+              "name": "value",
+              "value": "(\\s*/bin/sh\\s*-c\\s*)*\\s*apk.*up(date|grade)\\s*$"
+            }
+          ],
+          "trigger": "instruction"
+        },
+        {
+          "action": "WARN",
+          "comment": "section 4.7",
+          "gate": "dockerfile",
+          "id": "ea1b1c11-0633-48cc-8afc-92b252f331b3",
+          "params": [
+            {
+              "name": "instruction",
+              "value": "RUN"
+            },
+            {
+              "name": "check",
+              "value": "like"
+            },
+            {
+              "name": "value",
+              "value": "(\\s*/bin/sh\\s*-c\\s*)*\\s*yum.*up(date|grade)\\s*$"
+            }
+          ],
+          "trigger": "instruction"
+        },
+        {
+          "action": "WARN",
+          "comment": "section 4.7",
+          "gate": "dockerfile",
+          "id": "c5dbe7b8-b48b-4845-beff-069421d9d1ba",
+          "params": [
+            {
+              "name": "instruction",
+              "value": "RUN"
+            },
+            {
+              "name": "check",
+              "value": "like"
+            },
+            {
+              "name": "value",
+              "value": "(\\s*/bin/sh\\s*-c\\s*)*\\s*apt(-get)*.*up(date|grade)\\s*$"
+            }
+          ],
+          "trigger": "instruction"
+        },
       //   {
       //     "action": "STOP",
       //     "comment": "section 4.6",
@@ -269,48 +326,48 @@ const policy = {
       //     ],
       //     "trigger": "instruction"
       //   },
-      //   {
-      //     "action": "STOP",
-      //     "comment": "section 4.2",
-      //     "gate": "dockerfile",
-      //     "id": "f2b27bac-37e5-4ed2-b3f6-da7c76748b49",
-      //     "params": [
-      //       {
-      //         "name": "instruction",
-      //         "value": "FROM"
-      //       },
-      //       {
-      //         "name": "check",
-      //         "value": "not_in"
-      //       },
-      //       {
-      //         "name": "value",
-      //         "value": "example_trusted_base1,example_trusted_base2"
-      //       },
-      //       {
-      //         "name": "actual_dockerfile_only",
-      //         "value": "false"
-      //       }
-      //     ],
-      //     "trigger": "instruction"
-      //   },
-      //   {
-      //     "action": "STOP",
-      //     "comment": "section 4.1",
-      //     "gate": "dockerfile",
-      //     "id": "c96bf84d-0e76-435c-a94c-0f556bbaf45f",
-      //     "params": [
-      //       {
-      //         "name": "users",
-      //         "value": "root,docker"
-      //       },
-      //       {
-      //         "name": "type",
-      //         "value": "blacklist"
-      //       }
-      //     ],
-      //     "trigger": "effective_user"
-      //   }
+        {
+          "action": "STOP",
+          "comment": "section 4.2",
+          "gate": "dockerfile",
+          "id": "f2b27bac-37e5-4ed2-b3f6-da7c76748b49",
+          "params": [
+            {
+              "name": "instruction",
+              "value": "FROM"
+            },
+            {
+              "name": "check",
+              "value": "not_in"
+            },
+            {
+              "name": "value",
+              "value": "node"
+            },
+            {
+              "name": "actual_dockerfile_only",
+              "value": "false"
+            }
+          ],
+          "trigger": "instruction"
+        },
+        {
+          "action": "STOP",
+          "comment": "section 4.1",
+          "gate": "dockerfile",
+          "id": "c96bf84d-0e76-435c-a94c-0f556bbaf45f",
+          "params": [
+            {
+              "name": "users",
+              "value": "root,docker"
+            },
+            {
+              "name": "type",
+              "value": "blacklist"
+            }
+          ],
+          "trigger": "effective_user"
+        }
       ]
     },
     {
@@ -449,7 +506,39 @@ const policy = {
     }
   ],
   whitelisted_images: [],
+
+  /*
+    /usr/local/lib/node_modules/npm
+    /usr/local/share
+    /usr/local/bin
+    /usr/local/include/node/uv
+    /usr/local/include/node/openssl
+    /usr/local/include/node/libplatform
+  */
   whitelists: [
+    {
+      id: 'alpine-sgid-whitelist',
+      name: 'alpine-sgid-whitelist',
+      comment: 'whitelist for the node:12.16.*-alpine image required sgid files',
+      version: '1_0',
+      items: [
+        {
+          comment: 'whitelist /usr/local/lib/node_modules/npm',
+          gate: "files",
+          id: "9b37f652-81ea-4081-9696-e4078f13c02d",
+          trigger_id: "55e70e1271b16a5fc01c9fe837c59da0"
+        },
+        {
+          comment: 'whitelist /home/node',
+          gate: "files",
+          id: "9b37f652-81ea-4081-9696-e4078f13c02d",
+          trigger_id: "6a4ebdfb9a6b94597832ba9032885c9c"
+        },
+
+      ]
+    }
+
+
     // TODO: update these for alpine images
     // {
     //   "comment": "Example whitelist with triggerIds of files that are expected to have SUID/SGID, for rhel-based images",
@@ -704,5 +793,5 @@ const policy = {
   ]
 };
 
-validatePolicyTemplate(policy)
+// validatePolicyTemplate(policy)
 fs.writeFileSync(outputPath, Buffer.from(JSON.stringify(policy, null, 2)))

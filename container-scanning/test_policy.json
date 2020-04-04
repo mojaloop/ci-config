@@ -1,7 +1,7 @@
 {
   "blacklisted_images": [],
   "description": "Mojaloop Default Anchore Scan Policy, derived from Docker CIS 1.13.0 image checks",
-  "id": "mojaloop_default",
+  "id": "mojaloop-default",
   "last_updated": 1585637841,
   "mappings": [
     {

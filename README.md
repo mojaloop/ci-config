@@ -55,6 +55,7 @@ Let's see if we can hack it
 
 
 ## Test run command:
+> TODO: cleanup
 ```bash
 POLICY_FAILURE="false"
 ANCHORE_VERSION="v0.6.1"
@@ -103,4 +104,31 @@ What have we learned:
 - ids in the root mappings object are important, they must match
 - need at least 1 policy id
 - no lower limit on whitelists
+
+
+## Running locally:
+```bash
+export ANCHORE_CLI_USER=admin
+export ANCHORE_CLI_PASS=foobar
+export IMAGE="node:12.16.0-alpine"
+export POLICY_BUNDLE="test-policy.json"
+export POLICY_NAME="mojaloop-default"
+# IMAGE="${IMAGE:-node:12.16.0-alpine}"
+
+cd container-scanning
+./mojaloop-policy-generator.js test-policy.json
+
+anchore-cli policy add $POLICY_BUNDLE
+anchore-cli policy activate $POLICY_NAME
+
+anchore-cli image add $IMAGE
+anchore-cli image wait $IMAGE
+anchore-cli image list
+anchore-cli image get $IMAGE
+anchore-cli --json image vuln $IMAGE all > ${RESULT_DIR}${IMAGE//\//_}-vuln.json
+anchore-cli --json evaluate check $IMAGE --detail > ${IMAGE//\//_}-eval.json
+
+
+```
+
 
