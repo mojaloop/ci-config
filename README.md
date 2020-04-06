@@ -34,90 +34,45 @@ circleci orb create mojaloop/deployment
 We use anchore-cli for scanning our docker containers. Under `./container-scanning/` we have a bunch of scripts and config files which help us to evaluate the container scan output and automatically pass or fail our CI/CD pipelines accordingly.
 
 
-### Debugging container scans:
-
-Still getting this issue
-
-```
-Error: Policy bundle null not found in DB
-HTTP Code: 404
-Detail: {'error_codes': []}
+### Running Container Scans Locally 
+>Useful for debugging issues with the container scan, or updating the policy file
 
 
-Unable to activate policy bundle - /anchore-engine/policy.json -- using default policy bundle.
+#### Setup
 
-```
+Prerequisites:
+- `docker`, `docker-compose`
+- `pip`
 
-
-So it looks like this issue is with the actual inline image itself...
-Let's see if we can hack it 
-
-
-
-## Test run command:
-> TODO: cleanup
 ```bash
-POLICY_FAILURE="false"
-ANCHORE_VERSION="v0.6.1"
-TIMEOUT=500
-POLICY_BUNDLE_PATH="${HOME}/project/.circleci/.anchore/policy_bundle.json"
-DOCKERFILE_PATH=""
-IMAGE_NAME="docker.io/node:12.16.0-alpine ${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"
-run_cmd="curl -s https://ci-tools.anchore.io/inline_scan-${ANCHORE_VERSION} | bash -s -- -r -t $TIMEOUT"
+pip install --user anchorecli
 
-if [[ ! -z $POLICY_BUNDLE_PATH ]] && [[ -f $POLICY_BUNDLE_PATH ]]; then
-  run_cmd="$run_cmd -b $POLICY_BUNDLE_PATH"
-else
-  echo "ERROR - could not find policy bundle $POLICY_BUNDLE_PATH - using default policy bundle."
-fi
-if [[ ! -z $DOCKERFILE_PATH ]] && [[ -f $DOCKERFILE_PATH ]]; then
-  run_cmd="$run_cmd -d $DOCKERFILE_PATH"
-else
-  echo "ERROR - could not find Dockerfile $DOCKERFILE_PATH - Dockerfile not included in scan."
-fi
-run_cmd="$run_cmd $IMAGE_NAME"
-eval "$run_cmd"
+# install the anchore-cli docker-compose
+docker pull docker.io/anchore/anchore-engine:latest
+docker create --name ae docker.io/anchore/anchore-engine:latest
+docker cp ae:/docker-compose.yaml ./docker-compose.yaml
+docker rm ae
 
-
-ANCHORE_VERSION="v0.6.1"
-# POLICY_BUNDLE_PATH="${HOME}/project/.circleci/.anchore/policy_bundle.json"
-POLICY_BUNDLE_PATH="/tmp/ci-config/container-scanning/test_policy.json"
-POLICY_BUNDLE_PATH="/tmp/mojaloop-policy.json"
-IMAGE_NAME="docker.io/node:12.16.0-alpine"
-# IMAGE_NAME="docker.io/node:12.16.0-alpine ${DOCKER_ORG}/${CIRCLE_PROJECT_REPONAME}:${CIRCLE_TAG}"
-curl -s https://ci-tools.anchore.io/inline_scan-${ANCHORE_VERSION} > /tmp/inline-scan.sh
-
-bash /tmp/inline-scan.sh -r -t 500 -b ${POLICY_BUNDLE_PATH} ${IMAGE_NAME} > /tmp/output
-
-
-
-#newer:
-POLICY_BUNDLE_PATH="/tmp/mojaloop-policy.json"
-IMAGE_NAME="docker.io/node:12.16.0-alpine"
-cd /tmp/ci-config/container-scanning
-git pull && ./mojaloop-policy-generator.js ${POLICY_BUNDLE_PATH}
-bash /tmp/inline-scan.sh -r -t 500 -b ${POLICY_BUNDLE_PATH} ${IMAGE_NAME} > /tmp/output
-
+# Run. Note: this can take a while on the first run or after having destroyed the containers
+docker-compose up
 ```
 
-What have we learned:
-- ids in the root mappings object are important, they must match
-- need at least 1 policy id
-- no lower limit on whitelists
+#### Scanning
 
-
-## Running locally:
 ```bash
 export ANCHORE_CLI_USER=admin
 export ANCHORE_CLI_PASS=foobar
-export IMAGE="node:12.16.0-alpine"
+# export IMAGE="node:12.16.0-alpine"
+# export IMAGE="mojaloop/quoting-service:latest"
+export IMAGE="mojaloop/quoting-service:local"
 export POLICY_BUNDLE="test-policy.json"
 export POLICY_NAME="mojaloop-default"
 # IMAGE="${IMAGE:-node:12.16.0-alpine}"
 
-cd container-scanning
+cd ./container-scanning
 ./mojaloop-policy-generator.js test-policy.json
 
+# This step will fail here if your policy file is invalid
 anchore-cli policy add $POLICY_BUNDLE
 anchore-cli policy activate $POLICY_NAME
 
@@ -127,8 +82,22 @@ anchore-cli image list
 anchore-cli image get $IMAGE
 anchore-cli --json image vuln $IMAGE all > ${RESULT_DIR}${IMAGE//\//_}-vuln.json
 anchore-cli --json evaluate check $IMAGE --detail > ${IMAGE//\//_}-eval.json
+```
 
+
+### Debugging container scans:
+
+If you see an error similar to this in CircleCI:
 
 ```
+Error: Policy bundle null not found in DB
+HTTP Code: 404
+Detail: {'error_codes': []}
+
+
+Unable to activate policy bundle - /anchore-engine/policy.json -- using default policy bundle.
+```
+
+It likely means that the policy file is invalid. Use the steps above to ensure the policy file is valid before continuing.
 
 

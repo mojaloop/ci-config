@@ -21,7 +21,7 @@
       ]
     }
   ],
-  "name": "mojaloop_default",
+  "name": "mojaloopdefault",
   "policies": [
     {
       "comment": "Docker CIS section 4.8 and 4.10 checks.",
