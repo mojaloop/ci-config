@@ -118,7 +118,7 @@ export ANCHORE_CLI_USER=admin
 export ANCHORE_CLI_PASS=foobar
 # just an example image, you can pass in your own, such as `mojaloop/quoting-service:latest`
 # note: this image MUST live in a docker registry somewhere, by default this is Docker Hub
-export IMAGE="node:12.16.0-alpine"
+export IMAGE="node:12.16.1-alpine"
 export POLICY_BUNDLE="test-policy.json"
 export POLICY_NAME="mojaloop-default"
 

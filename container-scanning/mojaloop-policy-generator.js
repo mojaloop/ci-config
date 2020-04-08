@@ -50,7 +50,7 @@ const policy = {
       comment: 'mapping that matches mojaloop images',
       id: 'mapping-mojaloop',
       registry: '*',
-      repository: 'mojaloop',
+      repository: 'mojaloop/*',
       image: {
         type: 'tag',
         value: '*',
@@ -67,26 +67,25 @@ const policy = {
       ]
     },
     // Mapping that applies to all other images
-    // TODO: reenable
-    // {
-    //   comment: 'default mapping that matches all registry/repo:tag images',
-    //   id: 'mapping-default',
-    //   registry: '*',
-    //   repository: '*',
-    //   image: {
-    //     type: 'tag',
-    //     value: '*',
-    //   },
-    //   name: 'mapping-default',
-    //   policy_ids: [
-    //     'cis_file_checks',
-    //     'cis_dockerfile_checks',
-    //     'cis_software_checks',
-    //   ],
-    //   whitelist_ids: [
-    //     'npm-vulnerabilities',
-    //   ]
-    // }
+    {
+      comment: 'default mapping that matches all registry/repo:tag images',
+      id: 'mapping-default',
+      registry: '*',
+      repository: '*',
+      image: {
+        type: 'tag',
+        value: '*',
+      },
+      name: 'mapping-default',
+      policy_ids: [
+        'cis_file_checks',
+        'cis_dockerfile_checks',
+        'cis_software_checks',
+      ],
+      whitelist_ids: [
+        'npm-vulnerabilities',
+      ]
+    }
   ],
   /*
     Refer to the following Anchore docs to understand these policies:
@@ -99,14 +98,15 @@ const policy = {
       comment: 'Extended Dockerfile checks, not applied to base image',
       version: '1_0',
       rules: [
-        {
-          action: 'STOP',
-          comment: 'dockerfile not set',
-          gate: 'dockerfile',
-          id: 'dockerfile_checks_dockerfile',
-          params: [],
-          trigger: 'no_dockerfile_provided',
-        },
+        // Note: Anchore can imply a dockerfile here, so we don't really need one
+        // {
+        //   action: 'STOP',
+        //   comment: 'dockerfile not set',
+        //   gate: 'dockerfile',
+        //   id: 'dockerfile_checks_dockerfile',
+        //   params: [],
+        //   trigger: 'no_dockerfile_provided',
+        // },
         {
           action: 'STOP',
           comment: 'section 4.1',
