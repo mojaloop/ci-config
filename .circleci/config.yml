@@ -57,9 +57,6 @@ jobs:
           name: Download the mojaloop/ci-config repo
           command: |
             git clone https://github.com/mojaloop/ci-config /tmp/ci-config
-            
-            # TODO: remove step once we merge in this feature branch
-            cd /tmp/ci-config && git fetch && git checkout feature/anchore-scanning
 
             # Generate the mojaloop anchore-policy
             mkdir -p ~/project/.circleci/.anchore

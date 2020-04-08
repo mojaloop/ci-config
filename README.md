@@ -13,12 +13,11 @@ download your access token etc: https://circleci.com/docs/2.0/local-cli/#configu
 # setup your env
 circleci setup
 
-# validate the orb
-circleci orb validate deployment/orb.yaml
+# update the version in ./development/version
+vi ./development/version
 
-# publish a new version - make sure to increment the version in ./deveopment/version
-version=`cat ./deployment/version`
-circleci orb publish ./deployment/orb.yaml mojaloop/deployment@${version}
+# publish the updated org
+./_publish.sh
 ```
 
 ### Initial setup notes (this should only be done once)
