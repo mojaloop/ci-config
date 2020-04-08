@@ -67,25 +67,25 @@ const policy = {
       ]
     },
     // Mapping that applies to all other images
-    {
-      comment: 'default mapping that matches all registry/repo:tag images',
-      id: 'mapping-default',
-      registry: '*',
-      repository: '*',
-      image: {
-        type: 'tag',
-        value: '*',
-      },
-      name: 'mapping-default',
-      policy_ids: [
-        'cis_file_checks',
-        'cis_dockerfile_checks',
-        'cis_software_checks',
-      ],
-      whitelist_ids: [
-        'npm-vulnerabilities',
-      ]
-    }
+    // {
+    //   comment: 'default mapping that matches all registry/repo:tag images',
+    //   id: 'mapping-default',
+    //   registry: '*',
+    //   repository: '*',
+    //   image: {
+    //     type: 'tag',
+    //     value: '*',
+    //   },
+    //   name: 'mapping-default',
+    //   policy_ids: [
+    //     'cis_file_checks',
+    //     'cis_dockerfile_checks',
+    //     'cis_software_checks',
+    //   ],
+    //   whitelist_ids: [
+    //     'npm-vulnerabilities',
+    //   ]
+    // }
   ],
   /*
     Refer to the following Anchore docs to understand these policies:
