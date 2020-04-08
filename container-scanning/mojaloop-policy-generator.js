@@ -34,63 +34,6 @@ console.log(`Exporting policy path: ${outputPath}`)
 
 
 /**
- * @function similarArrays
- * @description Are the arrays similar? Uses length, and then iterates 
- *  through 1 array to perform lookup.
- *  
- *  1. if the lengths are different, returns false
- *  2. if arr2 contains something (using === equals) not in arr1, returns false
- *  3. Otherwise, returns true (it doesn't care about ordering)
- * 
- * @param {*} arr1 
- * @param {*} arr2 
- */
-function similarArrays(arr1, arr2) {
-  if (arr1.length !== arr2.length) {
-    return false
-  }
-
-  return arr2.reduce((acc, curr) => acc && arr1.indexOf(curr) !== -1, true)
-}
-
-/**
- * @function validatePolicyTemplate
- * 
- * @description Validates the policy template based on the following rules:
- *  1. The top level `mappings.policy_ids` and `mappings.whitelist_ids` are important,
- *     they must match the ids in the respective `policies` and `whitelists` map
- *  2. You must have AT LEAST ONE policy in the policies map
- *  3. There is no lower limit to the whitelists
- * 
- * @param {*} template  - The policy template
- */
-function validatePolicyTemplate(template) {
-  if (!template.mappings || template.mappings.length === 0) {
-    throw new Error('policy.mappings not found. This is required')
-  }
-
-  const { policy_ids, whitelist_ids } = template.mappings[0];
-  if (!policy_ids || policy_ids.length === 0) {
-    throw new Error('policy.mappings.policy_ids is required, and must have at least 1 entry')
-  }
-
-  if (!whitelist_ids) {
-    throw new Error('policy.whitelist_ids is required.')
-  }
-  
-  const foundPolicyIds = template.policies.map(p => p.id)
-  const foundWhitelistIds = template.whitelists.map(p => p.id)
-
-  if (!similarArrays(policy_ids, foundPolicyIds)) {
-    throw new Error('`policy.mappings.policy_ids` must be equal to ids in `policy.policies` Array')
-  }
-
-  if (!similarArrays(whitelist_ids, foundWhitelistIds)) {
-    throw new Error('`policy.mappings.whitelist_ids` must be equal to ids in `policy.whitelists` Array')
-  }
-}
-
-/**
  * Edit the policy inline here.
  * Based off of the Docker CIS 1.13.0 best practices
  */
@@ -114,17 +57,16 @@ const policy = {
       },
       name: 'mapping-mojaloop',
       policy_ids: [
-        'dockerfile_checks',
+        'derived_image_dockerfile_checks',
         'cis_file_checks',
-        '4f3bdc23-175b-4582-8c7d-3a7d8fa32a12',
-        'cb417967-266b-4453-bfb6-9acf67b0bee5',
+        'cis_dockerfile_checks',
+        'cis_software_checks',
       ],
       whitelist_ids: [
         'npm-vulnerabilities',
-        // "13f4c9fe-e86c-4b07-94fd-57fd086f1ff6",
-        // "add5d172-775c-461a-842e-41c87af671dc"
       ]
     },
+    // Mapping that applies to all other images
     {
       comment: 'default mapping that matches all registry/repo:tag images',
       id: 'mapping-default',
@@ -137,33 +79,21 @@ const policy = {
       name: 'mapping-default',
       policy_ids: [
         'cis_file_checks',
-        '4f3bdc23-175b-4582-8c7d-3a7d8fa32a12',
-        'cb417967-266b-4453-bfb6-9acf67b0bee5',
+        'cis_dockerfile_checks',
+        'cis_software_checks',
       ],
       whitelist_ids: [
         'npm-vulnerabilities',
-        // "13f4c9fe-e86c-4b07-94fd-57fd086f1ff6",
-        // "add5d172-775c-461a-842e-41c87af671dc"
       ]
     }
   ],
   /*
     Refer to the following Anchore docs to understand these policies:
     https://docs.anchore.com/current/docs/overview/concepts/policy/policy_checks/
-
-
-    ideas:
-
-    4.1 - It is a good practice to run the container as a non-root user, if possible. Though user namespace mapping is now available, if a user is already defined in the container image, the container is run as that user by default and specific user namespace remapping is not required. Create a non-root user for the container in the Dockerfile for the container image
-    4.6 - One of the important security triads is availability. Adding HEALTHCHECK instruction to your container image ensures that the docker engine periodically checks the running container instances against that instruction to ensure that the instances are still working. Based on the reported health status, the docker engine could then exit non-working containers and instantiate new ones. Add HEALTHCHECK instruction in your docker container images to perform the health check on running containers.
-    4.8 - setuid and setgid permissions could be used for elevating privileges. While these permissions are at times legitimately needed, these could potentially be used in privilege escalation attacks. Thus, you should consider dropping these permissions for the packages which do not need them within the images.
-    4.10  - Ensure secrets are not stored in Dockerfiles
-    5.8  - Ensure that only needed ports are open on the container
-
   */
   policies: [
     {
-      id: 'dockerfile_checks',
+      id: 'derived_image_dockerfile_checks',
       name: 'Dockerfile Checks',
       comment: 'Extended Dockerfile checks, not applied to base image',
       version: '1_0',
@@ -175,6 +105,23 @@ const policy = {
           id: 'dockerfile_checks_dockerfile',
           params: [],
           trigger: 'no_dockerfile_provided',
+        },
+        {
+          action: "STOP",
+          comment: "section 4.1",
+          gate: "dockerfile",
+          id: "c96bf84d-0e76-435c-a94c-0f556bbaf45f",
+          params: [
+            {
+              name: "users",
+              value: "root,docker"
+            },
+            {
+              name: "type",
+              value: "blacklist"
+            }
+          ],
+          trigger: "effective_user"
         }
       ]
     },
@@ -197,7 +144,7 @@ const policy = {
     },
     {
       comment: "Docker CIS section 4.1, 4.2, 4.6, 4.7, 4.9 and 5.8 checks.",
-      id: "cb417967-266b-4453-bfb6-9acf67b0bee5",
+      id: "cis_dockerfile_checks",
       name: "CIS Dockerfile Checks",
       version: "1_0",
       rules: [
@@ -327,28 +274,11 @@ const policy = {
           ],
           "trigger": "instruction"
         },
-        {
-          "action": "STOP",
-          "comment": "section 4.1",
-          "gate": "dockerfile",
-          "id": "c96bf84d-0e76-435c-a94c-0f556bbaf45f",
-          "params": [
-            {
-              "name": "users",
-              "value": "root,docker"
-            },
-            {
-              "name": "type",
-              "value": "blacklist"
-            }
-          ],
-          "trigger": "effective_user"
-        }
       ]
     },
     {
       comment: "Docker CIS section 4.3 and 4.4 checks.",
-      id: "4f3bdc23-175b-4582-8c7d-3a7d8fa32a12",
+      id: "cis_software_checks",
       name: "CIS Software Checks",
       version: "1_0",
       rules: [
@@ -484,5 +414,4 @@ const policy = {
   ]
 };
 
-// validatePolicyTemplate(policy)
 fs.writeFileSync(outputPath, Buffer.from(JSON.stringify(policy, null, 2)))
