@@ -39,9 +39,9 @@ console.log(`Exporting policy path: ${outputPath}`)
  */
 const policy = {
   id: 'mojaloop-default',
-  name: "mojaloop-default",
-  version: "1_0",
-  description: "Mojaloop default Anchore policy, based on the Docker CIS 1.13.0 image content checks.",
+  name: 'mojaloop-default',
+  version: '1_0',
+  description: 'Mojaloop default Anchore policy, based on the Docker CIS 1.13.0 image content checks.',
   last_updated: Math.floor((new Date()).getTime()/1000),
   blacklisted_images: [],
   mappings: [
@@ -99,289 +99,289 @@ const policy = {
       version: '1_0',
       rules: [
         {
-          action: "STOP",
-          comment: "dockerfile not set",
+          action: 'STOP',
+          comment: 'dockerfile not set',
           gate: 'dockerfile',
           id: 'dockerfile_checks_dockerfile',
           params: [],
           trigger: 'no_dockerfile_provided',
         },
         {
-          action: "STOP",
-          comment: "section 4.1",
-          gate: "dockerfile",
-          id: "c96bf84d-0e76-435c-a94c-0f556bbaf45f",
+          action: 'STOP',
+          comment: 'section 4.1',
+          gate: 'dockerfile',
+          id: 'c96bf84d-0e76-435c-a94c-0f556bbaf45f',
           params: [
             {
-              name: "users",
-              value: "root,docker"
+              name: 'users',
+              value: 'root,docker'
             },
             {
-              name: "type",
-              value: "blacklist"
+              name: 'type',
+              value: 'blacklist'
             }
           ],
-          trigger: "effective_user"
+          trigger: 'effective_user'
         }
       ]
     },
     {
-      id: "cis_file_checks",
-      name: "CIS File Checks",
-      comment: "Docker CIS 4.10 checks.",
+      id: 'cis_file_checks',
+      name: 'CIS File Checks',
+      comment: 'Docker CIS 4.10 checks.',
       version: '1_0',
       rules: [
         {
-          "action": "WARN",
-          "comment": "section 4.10",
-          "gate": "secret_scans",
-          "id": "c0e5e302-764d-4b19-9fbd-5c7b0b558673",
-          "params": [],
-          "trigger": "content_regex_checks"
+          action: 'WARN',
+          comment: 'section 4.10',
+          gate: 'secret_scans',
+          id: 'c0e5e302-764d-4b19-9fbd-5c7b0b558673',
+          params: [],
+          trigger: 'content_regex_checks'
         }
       ],
-      version: "1_0"
+      version: '1_0'
     },
     {
-      comment: "Docker CIS section 4.1, 4.2, 4.6, 4.7, 4.9 and 5.8 checks.",
-      id: "cis_dockerfile_checks",
-      name: "CIS Dockerfile Checks",
-      version: "1_0",
+      comment: 'Docker CIS section 4.1, 4.2, 4.6, 4.7, 4.9 and 5.8 checks.',
+      id: 'cis_dockerfile_checks',
+      name: 'CIS Dockerfile Checks',
+      version: '1_0',
       rules: [
         {
-          action: "STOP",
-          comment: "section 5.8. allow only whitelisted 'mojaloop' ports 3000,3001,3002,3007,3080,3081,4001,4002",
-          gate: "dockerfile",
-          id: "ef85285b-801b-48a4-b130-3a35e2d58133",
+          action: 'STOP',
+          comment: 'section 5.8. allow only whitelisted `mojaloop` ports 3000,3001,3002,3007,3080,3081,4001,4002',
+          gate: 'dockerfile',
+          id: 'ef85285b-801b-48a4-b130-3a35e2d58133',
           params: [
             {
-              name: "ports",
-              value: "3000,3001,3002,3007,3080,3081,4001,4002"
+              name: 'ports',
+              value: '3000,3001,3002,3007,3080,3081,4001,4002'
             },
             {
-              name: "type",
-              value: "whitelist"
+              name: 'type',
+              value: 'whitelist'
             }
           ],
-          trigger: "exposed_ports"
+          trigger: 'exposed_ports'
         },
         {
-          action: "WARN",
-          comment: "section",
-          gate: "dockerfile",
-          id: "e9eacc50-aaac-4241-95ac-790cf0be84da",
+          action: 'WARN',
+          comment: 'section',
+          gate: 'dockerfile',
+          id: 'e9eacc50-aaac-4241-95ac-790cf0be84da',
           params: [
             {
-              name: "instruction",
-              value: "ADD"
+              name: 'instruction',
+              value: 'ADD'
             },
             {
-              name: "check",
-              value: "exists"
+              name: 'check',
+              value: 'exists'
             },
             {
-              name: "actual_dockerfile_only",
-              value: "true"
+              name: 'actual_dockerfile_only',
+              value: 'true'
             }
           ],
-          trigger: "instruction"
+          trigger: 'instruction'
         },
         {
-          action: "WARN",
-          comment: "section 4.7",
-          gate: "dockerfile",
-          id: "2f87d4bf-e963-496a-8b3d-ff90bef46014",
+          action: 'WARN',
+          comment: 'section 4.7',
+          gate: 'dockerfile',
+          id: '2f87d4bf-e963-496a-8b3d-ff90bef46014',
           params: [
             {
-              name: "instruction",
-              value: "RUN"
+              name: 'instruction',
+              value: 'RUN'
             },
             {
-              name: "check",
-              value: "like"
+              name: 'check',
+              value: 'like'
             },
             {
-              name: "value",
-              value: "(\\s*/bin/sh\\s*-c\\s*)*\\s*apk.*up(date|grade)\\s*$"
+              name: 'value',
+              value: '(\\s*/bin/sh\\s*-c\\s*)*\\s*apk.*up(date|grade)\\s*$'
             }
           ],
-          trigger: "instruction"
+          trigger: 'instruction'
         },
         {
-          action: "WARN",
-          comment: "section 4.7",
-          gate: "dockerfile",
-          id: "ea1b1c11-0633-48cc-8afc-92b252f331b3",
+          action: 'WARN',
+          comment: 'section 4.7',
+          gate: 'dockerfile',
+          id: 'ea1b1c11-0633-48cc-8afc-92b252f331b3',
           params: [
             {
-              name: "instruction",
-              value: "RUN"
+              name: 'instruction',
+              value: 'RUN'
             },
             {
-              name: "check",
-              value: "like"
+              name: 'check',
+              value: 'like'
             },
             {
-              name: "value",
-              value: "(\\s*/bin/sh\\s*-c\\s*)*\\s*yum.*up(date|grade)\\s*$"
+              name: 'value',
+              value: '(\\s*/bin/sh\\s*-c\\s*)*\\s*yum.*up(date|grade)\\s*$'
             }
           ],
-          trigger: "instruction"
+          trigger: 'instruction'
         },
         {
-          "action": "WARN",
-          "comment": "section 4.7",
-          "gate": "dockerfile",
-          "id": "c5dbe7b8-b48b-4845-beff-069421d9d1ba",
-          "params": [
+          action: 'WARN',
+          comment: 'section 4.7',
+          gate: 'dockerfile',
+          id: 'c5dbe7b8-b48b-4845-beff-069421d9d1ba',
+          params: [
             {
-              "name": "instruction",
-              "value": "RUN"
+              name: 'instruction',
+              value: 'RUN'
             },
             {
-              "name": "check",
-              "value": "like"
+              name: 'check',
+              value: 'like'
             },
             {
-              "name": "value",
-              "value": "(\\s*/bin/sh\\s*-c\\s*)*\\s*apt(-get)*.*up(date|grade)\\s*$"
+              name: 'value',
+              value: '(\\s*/bin/sh\\s*-c\\s*)*\\s*apt(-get)*.*up(date|grade)\\s*$'
             }
           ],
-          "trigger": "instruction"
+          trigger: 'instruction'
         },
         {
-          "action": "STOP",
-          "comment": "section 4.2",
-          "gate": "dockerfile",
-          "id": "f2b27bac-37e5-4ed2-b3f6-da7c76748b49",
-          "params": [
+          action: 'STOP',
+          comment: 'section 4.2',
+          gate: 'dockerfile',
+          id: 'f2b27bac-37e5-4ed2-b3f6-da7c76748b49',
+          params: [
             {
-              "name": "instruction",
-              "value": "FROM"
+              name: 'instruction',
+              value: 'FROM'
             },
             {
-              "name": "check",
-              "value": "in"
+              name: 'check',
+              value: 'in'
             },
             {
-              "name": "value",
-              "value": "node"
+              name: 'value',
+              value: 'node'
             },
             {
-              "name": "actual_dockerfile_only",
-              "value": "true"
+              name: 'actual_dockerfile_only',
+              value: 'true'
             }
           ],
-          "trigger": "instruction"
+          trigger: 'instruction'
         },
       ]
     },
     {
-      comment: "Docker CIS section 4.3 and 4.4 checks.",
-      id: "cis_software_checks",
-      name: "CIS Software Checks",
-      version: "1_0",
+      comment: 'Docker CIS section 4.3 and 4.4 checks.',
+      id: 'cis_software_checks',
+      name: 'CIS Software Checks',
+      version: '1_0',
       rules: [
         /* Warn on negligible vulnerabilities */
         {
-          "action": "WARN",
-          "comment": "section 4.4",
-          "gate": "vulnerabilities",
-          "id": "8955f515-60e2-4483-bdf4-2fe475fe0c8c",
-          "params": [
+          action: 'WARN',
+          comment: 'section 4.4',
+          gate: 'vulnerabilities',
+          id: '8955f515-60e2-4483-bdf4-2fe475fe0c8c',
+          params: [
             {
-              "name": "package_type",
-              "value": "all"
+              name: 'package_type',
+              value: 'all'
             },
             {
-              "name": "severity_comparison",
-              "value": "<="
+              name: 'severity_comparison',
+              value: '<='
             },
             {
-              "name": "severity",
-              "value": "negligible"
+              name: 'severity',
+              value: 'negligible'
             },
             {
-              "name": "vendor_only",
-              "value": "true"
+              name: 'vendor_only',
+              value: 'true'
             }
           ],
-          "trigger": "package"
+          trigger: 'package'
         },
         /* STOP on vulnerabilities above 'low' severity */
         {
-          "action": "STOP",
-          "comment": "section 4.4",
-          "gate": "vulnerabilities",
-          "id": "0821c410-b0d4-4a25-90d7-aa71b46d7e32",
-          "params": [
+          action: 'STOP',
+          comment: 'section 4.4',
+          gate: 'vulnerabilities',
+          id: '0821c410-b0d4-4a25-90d7-aa71b46d7e32',
+          params: [
             {
-              "name": "package_type",
-              "value": "all"
+              name: 'package_type',
+              value: 'all'
             },
             {
-              "name": "severity_comparison",
-              "value": ">="
+              name: 'severity_comparison',
+              value: '>='
             },
             {
-              "name": "severity",
-              "value": "low"
+              name: 'severity',
+              value: 'low'
             },
             {
-              "name": "vendor_only",
-              "value": "true"
+              name: 'vendor_only',
+              value: 'true'
             }
           ],
-          "trigger": "package"
+          trigger: 'package'
         },
         /* STOP on vulnerabilities that have fixes available */
         {
-          "action": "STOP",
-          "comment": "section 4.4",
-          "gate": "vulnerabilities",
-          "id": "211fa08b-e69a-4165-a0df-05cd3bd0e002",
-          "params": [
+          action: 'STOP',
+          comment: 'section 4.4',
+          gate: 'vulnerabilities',
+          id: '211fa08b-e69a-4165-a0df-05cd3bd0e002',
+          params: [
             {
-              "name": "package_type",
-              "value": "all"
+              name: 'package_type',
+              value: 'all'
             },
             {
-              "name": "severity_comparison",
-              "value": ">="
+              name: 'severity_comparison',
+              value: '>='
             },
             {
-              "name": "severity",
-              "value": "unknown"
+              name: 'severity',
+              value: 'unknown'
             },
             {
-              "name": "fix_available",
-              "value": "true"
+              name: 'fix_available',
+              value: 'true'
             }
           ],
-          "trigger": "package"
+          trigger: 'package'
         },
       /* STOP if vuln data is out of date */
         {
-          "action": "STOP",
-          "comment": "section 4.4",
-          "gate": "vulnerabilities",
-          "id": "e3a73079-fe16-4de6-9b2f-3982277e57d5",
-          "params": [
+          action: 'STOP',
+          comment: 'section 4.4',
+          gate: 'vulnerabilities',
+          id: 'e3a73079-fe16-4de6-9b2f-3982277e57d5',
+          params: [
             {
-              "name": "max_days_since_sync",
-              "value": "2"
+              name: 'max_days_since_sync',
+              value: '2'
             }
           ],
-          "trigger": "stale_feed_data"
+          trigger: 'stale_feed_data'
         },
         /* STOP if vuln data isn't available */
         {
-          "action": "STOP",
-          "comment": "section 4.4",
-          "gate": "vulnerabilities",
-          "id": "aeff8bdb-82b5-44fd-87ef-d8fdd50893e8",
-          "params": [],
-          "trigger": "vulnerability_data_unavailable"
+          action: 'STOP',
+          comment: 'section 4.4',
+          gate: 'vulnerabilities',
+          id: 'aeff8bdb-82b5-44fd-87ef-d8fdd50893e8',
+          params: [],
+          trigger: 'vulnerability_data_unavailable'
         }
       ]
     }

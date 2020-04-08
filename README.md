@@ -64,7 +64,7 @@ export ANCHORE_CLI_USER=admin
 export ANCHORE_CLI_PASS=foobar
 # export IMAGE="node:12.16.0-alpine"
 # export IMAGE="mojaloop/quoting-service:latest"
-export IMAGE="mojaloop/quoting-service:local"
+export IMAGE="ldaly/quoting-service:latest"
 export POLICY_BUNDLE="test-policy.json"
 export POLICY_NAME="mojaloop-default"
 # IMAGE="${IMAGE:-node:12.16.0-alpine}"
@@ -73,11 +73,9 @@ cd ./container-scanning
 ./mojaloop-policy-generator.js test-policy.json
 
 # This step will fail here if your policy file is invalid
-anchore-cli policy add $POLICY_BUNDLE
-anchore-cli policy activate $POLICY_NAME
+anchore-cli policy add $POLICY_BUNDLE && anchore-cli policy activate $POLICY_NAME
 
-anchore-cli image add $IMAGE
-anchore-cli image wait $IMAGE
+anchore-cli image add $IMAGE && anchore-cli image wait $IMAGE
 anchore-cli image list
 anchore-cli image get $IMAGE
 anchore-cli --json image vuln $IMAGE all > ${RESULT_DIR}${IMAGE//\//_}-vuln.json
