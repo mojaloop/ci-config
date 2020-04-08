@@ -91,7 +91,6 @@ Found 1 rows present in derived image with "STOP" direction. Exiting with error 
 You can also test these tools locally along with Anchore engine. 
 This setup uses a locally installed `anchorecli` along with the docker version of anchore engine.
 
-
 #### 0. Setup
 
 Prerequisites:
