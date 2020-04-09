@@ -44,20 +44,42 @@ const policy = {
   description: 'Mojaloop default Anchore policy, based on the Docker CIS 1.13.0 image content checks.',
   last_updated: Math.floor((new Date()).getTime()/1000),
   blacklisted_images: [],
+  // Ref: https://docs.anchore.com/current/docs/overview/concepts/policy/policy_mappings/
   mappings: [
     // Apply for all `mojaloop/*` derived images
+    // {
+    //   comment: 'mapping that matches mojaloop images',
+    //   id: 'mapping-mojaloop',
+    //   // Note: this isn't working for the inline-scanner that CircleCI uses, since it rewrites the registry and repository
+    //   registry: '*',
+    //   repository: 'mojaloop/*',
+    //   image: {
+    //     type: 'tag',
+    //     value: '*',
+    //   },
+    //   name: 'mapping-mojaloop',
+    //   policy_ids: [
+    //     'derived_image_dockerfile_checks',
+    //     'cis_file_checks',
+    //     'cis_dockerfile_checks',
+    //     'cis_software_checks',
+    //   ],
+    //   whitelist_ids: [
+    //     'npm-vulnerabilities',
+    //   ]
+    // },
+    //Mapping that applies to 'node' base images
     {
-      comment: 'mapping that matches mojaloop images',
-      id: 'mapping-mojaloop',
+      comment: 'default mapping that matches all `node` base images',
+      id: 'mapping-default',
       registry: '*',
-      repository: 'mojaloop/*',
+      repository: 'node*',
       image: {
         type: 'tag',
         value: '*',
       },
-      name: 'mapping-mojaloop',
+      name: 'mapping-default',
       policy_ids: [
-        'derived_image_dockerfile_checks',
         'cis_file_checks',
         'cis_dockerfile_checks',
         'cis_software_checks',
@@ -67,25 +89,26 @@ const policy = {
       ]
     },
     // Mapping that applies to all other images
-    // {
-    //   comment: 'default mapping that matches all registry/repo:tag images',
-    //   id: 'mapping-default',
-    //   registry: '*',
-    //   repository: '*',
-    //   image: {
-    //     type: 'tag',
-    //     value: '*',
-    //   },
-    //   name: 'mapping-default',
-    //   policy_ids: [
-    //     'cis_file_checks',
-    //     'cis_dockerfile_checks',
-    //     'cis_software_checks',
-    //   ],
-    //   whitelist_ids: [
-    //     'npm-vulnerabilities',
-    //   ]
-    // }
+    {
+      comment: 'default mapping that matches all registry/repo:tag images',
+      id: 'mapping-default',
+      registry: '*',
+      repository: '*',
+      image: {
+        type: 'tag',
+        value: '*',
+      },
+      name: 'mapping-default',
+      policy_ids: [
+        'derived_image_dockerfile_checks',
+        'cis_file_checks',
+        'cis_dockerfile_checks',
+        'cis_software_checks',
+      ],
+      whitelist_ids: [
+        'npm-vulnerabilities',
+      ]
+    }
   ],
   /*
     Refer to the following Anchore docs to understand these policies:
