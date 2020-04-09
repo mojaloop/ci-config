@@ -44,41 +44,42 @@ const policy = {
   description: 'Mojaloop default Anchore policy, based on the Docker CIS 1.13.0 image content checks.',
   last_updated: Math.floor((new Date()).getTime()/1000),
   blacklisted_images: [],
-  // Ref: https://docs.anchore.com/current/docs/overview/concepts/policy/policy_mappings/
   mappings: [
+    // Ref: https://docs.anchore.com/current/docs/overview/concepts/policy/policy_mappings/
     // Apply for all `mojaloop/*` derived images
-    // {
-    //   comment: 'mapping that matches mojaloop images',
-    //   id: 'mapping-mojaloop',
-    //   // Note: this isn't working for the inline-scanner that CircleCI uses, since it rewrites the registry and repository
-    //   registry: '*',
-    //   repository: 'mojaloop/*',
-    //   image: {
-    //     type: 'tag',
-    //     value: '*',
-    //   },
-    //   name: 'mapping-mojaloop',
-    //   policy_ids: [
-    //     'derived_image_dockerfile_checks',
-    //     'cis_file_checks',
-    //     'cis_dockerfile_checks',
-    //     'cis_software_checks',
-    //   ],
-    //   whitelist_ids: [
-    //     'npm-vulnerabilities',
-    //   ]
-    // },
-    //Mapping that applies to 'node' base images
+    // Note: this isn't working for the inline-scanner that CircleCI uses, since it rewrites the registry and repository
     {
-      comment: 'default mapping that matches all `node` base images',
-      id: 'mapping-default',
+      comment: 'mapping that matches mojaloop images',
+      id: 'mapping-mojaloop',
+      registry: '*',
+      repository: 'mojaloop/*',
+      image: {
+        type: 'tag',
+        value: '*',
+      },
+      name: 'mapping-mojaloop',
+      policy_ids: [
+        'derived_image_dockerfile_checks',
+        'cis_file_checks',
+        'cis_dockerfile_checks',
+        'cis_software_checks',
+      ],
+      whitelist_ids: [
+        'npm-vulnerabilities',
+      ]
+    },
+    // Mapping that applies to 'node' base images
+    // If we start using different base images, we should add them here
+    {
+      comment: 'mapping that matches all `node` base images',
+      id: 'mapping-node',
       registry: '*',
       repository: 'node*',
       image: {
         type: 'tag',
         value: '*',
       },
-      name: 'mapping-default',
+      name: 'mapping-node',
       policy_ids: [
         'cis_file_checks',
         'cis_dockerfile_checks',
@@ -89,6 +90,8 @@ const policy = {
       ]
     },
     // Mapping that applies to all other images
+    // While it would be better to apply a special wildcard
+    // for mojaloop/* images, during scan time, this repo doesn't exist
     {
       comment: 'default mapping that matches all registry/repo:tag images',
       id: 'mapping-default',
