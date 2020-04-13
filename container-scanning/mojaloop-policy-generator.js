@@ -436,6 +436,32 @@ const policy = {
           gate: 'vulnerabilities',
           trigger_id: 'CVE-2020-7608+*',
         },
+        // Whitelists for https://github.com/mojaloop/project/issues/1292 (mongodb vulnerabilities)
+        {
+          id: 'rule4',
+          gate: 'vulnerabilities',
+          trigger_id: 'CVE-2017-15535+*',
+        },
+        {
+          id: 'rule5',
+          gate: 'vulnerabilities',
+          trigger_id: 'CVE-2020-7610+*',
+        },
+        {
+          id: 'rule6',
+          gate: 'vulnerabilities',
+          trigger_id: 'CVE-2019-2386+*',
+        },
+        {
+          id: 'rule7',
+          gate: 'vulnerabilities',
+          trigger_id: 'CVE-2019-2390+*',
+        },
+        {
+          id: 'rule8',
+          gate: 'vulnerabilities',
+          trigger_id: 'CVE-2019-2389+*',
+        },
       ]
     }
   ]
