@@ -4,21 +4,21 @@ const fs = require('fs')
 
 /**
  * This file generates an anchore-cli compatible policy.json file.
- * 
- * usage: 
+ *
+ * usage:
  *    ./mojaloop-policy-generator.js <full path of desired output file>
- * 
+ *
  * for example:
  *    ./mojaloop-policy-generator.js /tmp/mojaloop-policy.json
- * 
- * We keep this in a .js file as it allows us to better manage the complicated policy file with comments, etc 
- * 
- * 
- *  Tips for writing a valid file (anchore has no easy policy checker, so if this 
+ *
+ * We keep this in a .js file as it allows us to better manage the complicated policy file with comments, etc
+ *
+ *
+ *  Tips for writing a valid file (anchore has no easy policy checker, so if this
  *  file is written incorrectly, it will simply fail and default to the default
  *  policy file
- * 
- *  1. The top level `mappings.policy_ids` and `mappings.whitelist_ids` are important, 
+ *
+ *  1. The top level `mappings.policy_ids` and `mappings.whitelist_ids` are important,
  *     they must match the ids in the respective `policies` and `whitelists` map
  *  2. You must have AT LEAST ONE policy in the policies map
  *  3. There is no lower limit to the whitelists
@@ -177,13 +177,13 @@ const policy = {
       rules: [
         {
           action: 'STOP',
-          comment: 'section 5.8. allow only whitelisted `mojaloop` ports 3000,3001,3002,3007,3080,3081,4001,4002',
+          comment: 'section 5.8. allow only whitelisted `mojaloop` ports 3000,3001,3002,3007,3008,3080,3081,4001,4002',
           gate: 'dockerfile',
           id: 'ef85285b-801b-48a4-b130-3a35e2d58133',
           params: [
             {
               name: 'ports',
-              value: '3000,3001,3002,3007,3080,3081,4001,4002'
+              value: '3000,3001,3002,3007,3008,3080,3081,4001,4002'
             },
             {
               name: 'type',
