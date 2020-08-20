@@ -467,6 +467,11 @@ const policy = {
           gate: 'vulnerabilities',
           trigger_id: 'CVE-2016-6494+*',
         },
+        {
+          id: 'rule10',
+          gate: 'vulnerabilities',
+          trigger_id: 'CVE-2020-7921+*',
+        },
       ]
     }
   ]
