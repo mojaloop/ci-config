@@ -34,6 +34,7 @@ pr-tools is a common set of utilities for checking PRs in the mojaloop community
 ```bash 
 circleci namespace create mojaloop github mojaloop #this can only be done once per org
 circleci orb create mojaloop/deployment
+circleci orb create mojaloop/pr-tools
 ```
 
 ## Container Scanning

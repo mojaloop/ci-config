@@ -28,74 +28,12 @@ commands:
       - run:
           name: checkout ci-config repo
           command: |
-            git clone https://github.com/mojaloop/ci-config.git
+            git clone -b feat/pr-title-orb https://github.com/mojaloop/ci-config.git
             cd ci-config && npm install
-      - restore_cache:
-          keys:
-            - dependency-cache-{{ checksum "package-lock.json" }}
       - run:
           name: Check the PR title
           command: |
             echo "${CIRCLE_PULL_REQUESTS}"
             echo "${CIRCLE_PULL_REQUEST}"
-            cd ci-config && ./pr-tools/_pr_title.js
-
-
-  setup_and_run:
-    parameters:
-      helm_set_values:
-        description: The update string to pass through to `helm upgrade`
-        type: string
-        # default: .central.centralhub.centralledger.containers
-        default: |
-          --set quoting-service.image.repository=$DOCKER_ORG/$CIRCLE_PROJECT_REPONAME \
-          --set quoting-service.image.tag=$CIRCLE_TAG
-
-    description: Set up kubectl and helm, and deploy the updated container
-    steps:
-      - run: 
-          name: Set up tools
-          command: |
-              apk --no-cache add \
-                      python \
-                      py-pip \
-                      groff \
-                      less \
-                      mailcap \
-                      jq
-              pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
-              apk -v --purge del py-pip
-      - run:
-          name: Set env variables
-          command: |
-            set -u
-            echo 'export HELM_VALUE_SET_VALUES="<<parameters.helm_set_values>>"' >> $BASH_ENV
-            K8_HELM_CHART_VERSION=$(curl -s https://api.github.com/repos/mojaloop/helm/releases/latest | jq -r '.tag_name')
-            echo "export K8_HELM_CHART_VERSION=${K8_HELM_CHART_VERSION}" >> $BASH_ENV
-      - run:
-          name: Set up kubectl and helm
-          command: |
-            set -u
-            
-            # Download the latest values.yaml file from the mojaloop/helm repo
-            mkdir -p $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM
-            curl -s https://raw.githubusercontent.com/mojaloop/helm/${K8_HELM_CHART_VERSION}/mojaloop/values.yaml > $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/$HELM_VALUE_FILENAME
-
-            kubectl config set-cluster $K8_CLUSTER_NAME --server=$K8_CLUSTER_SERVER --insecure-skip-tls-verify=true
-            kubectl config set-credentials $K8_USER_NAME --token=$K8_USER_TOKEN
-            kubectl config set-context $K8_CLUSTER_NAME --cluster=$K8_CLUSTER_NAME --user=$K8_USER_NAME --namespace=$K8_NAMESPACE
-            kubectl config use-context $K8_CLUSTER_NAME
-
-            helm repo add mojaloop $HELM_MOJALOOP_REPO_PATH
-            helm init --client-only
-      - run:
-          name: Deploy updated service
-          command: |
-            set -u
-            helm upgrade $K8_RELEASE_NAME \
-              --repo=$HELM_MOJALOOP_REPO_PATH \
-              --version $K8_HELM_CHART_VERSION \
-              --reuse-values $HELM_VALUE_SET_VALUES \
-              -f $CIRCLE_WORKING_DIRECTORY/$AWS_S3_DIR_DEVOPS_DEPLOYMENT_CONFIG_HELM/$HELM_VALUE_FILENAME \
-                $K8_HELM_CHART_NAME \
-                --install
+            ls -la
+            cd ci-config && ls -la &&  ./pr-tools/_pr_title.js
