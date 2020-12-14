@@ -4,7 +4,7 @@ description: |
   mojaloop/pr-tools is a CircleCI orb for convenience functions and utilities in Mojaloop CI/CD pipelines
 
 executors:
-  default-docker:
+  default:
     working_directory: /home/circleci/project
     docker:
       - image: node:12.16.1-alpine
@@ -17,14 +17,18 @@ commands:
       - run:
           name: Install general dependencies
           command: |
-            # TODO: trim these down
-            apk --no-cache add git
-            apk --no-cache add ca-certificates
-            apk --no-cache add curl
-            apk --no-cache add openssh-client
-            apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake jq
-            npm config set unsafe-perm true
-            npm install -g node-gyp
+            apk --no-cache add git \
+              ca-certificates \
+              curl \
+              openssh-client \
+              build-dependencies \
+              make \
+              gcc \
+              g++ \
+              libtool \
+              autoconf \
+              automake \
+              jq
       # Orbs don't let you package anything more than basic shell scripts
       # so we bootstrap this orb by checking out the code in the repo
       # TODO: checkout based on deterministic git tag
@@ -36,7 +40,12 @@ commands:
       - run:
           name: Check the PR title
           command: |
-            echo "${CIRCLE_PULL_REQUESTS}"
-            echo "${CIRCLE_PULL_REQUEST}"
-            ls -la
-            cd ci-config && ls -la &&  ./pr-tools/_pr_title.js
+            echo "env CIRCLE_PULL_REQUESTS: ${CIRCLE_PULL_REQUESTS}"
+            echo "env CIRCLE_PULL_REQUEST: ${CIRCLE_PULL_REQUEST}"
+            cd ci-config &&  ./pr-tools/_pr_title.js
+
+jobs:
+  pr-title-check:
+    executors: default
+    steps:
+      - pr-title-check
