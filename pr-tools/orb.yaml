@@ -10,32 +10,25 @@ executors:
       - image: node:12.16.1-alpine
 
 commands:
-  pr-title-check:
+  setup-and-run-pr-title-check:
     description: Check the title of a Github pull request
-    # parameters:
+    parameters:
+      ci-config-branch:
+        default: master
+        type: string
     steps:
       - run:
           name: Install general dependencies
           command: |
-            apk --no-cache add git \
-              ca-certificates \
-              curl \
-              openssh-client \
-              build-dependencies \
-              make \
-              gcc \
-              g++ \
-              libtool \
-              autoconf \
-              automake \
-              jq
+            apk --no-cache add git ca-certificates curl openssh-client
+            apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake jq
       # Orbs don't let you package anything more than basic shell scripts
       # so we bootstrap this orb by checking out the code in the repo
       # TODO: checkout based on deterministic git tag
       - run:
           name: checkout ci-config repo
           command: |
-            git clone -b feat/pr-title-orb https://github.com/mojaloop/ci-config.git
+            git clone -b << parameters.ci-config-branch >> https://github.com/mojaloop/ci-config.git
             cd ci-config/pr-tools && npm install
       - run:
           name: Check the PR title
@@ -46,6 +39,6 @@ commands:
 
 jobs:
   pr-title-check:
-    executors: default
+    executor: default
     steps:
-      - pr-title-check
+      - setup-and-run-pr-title-check
