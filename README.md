@@ -4,9 +4,12 @@ CI-Config is a repo for shared CI/CD config for the Mojaloop Project.
 
 To begin with, this will host CircleCI orbs we author and publish, but this could expand to other shared config in the future
 
-## CircleCI Orb: mojaloop-deployment
+## CircleCI Orbs: 
 
-CirlceCI orbs are a way to share common config between CircleCI environment. In Mojaloop we use both external orbs in `anchore-cli` and this internally developed orb, `mojaloop-deployment`
+CirlceCI orbs are a way to share common config between CircleCI environment. In this repo, we author and maintain the shared orbs for the Mojaloop project.
+### mojaloop-deployment
+
+In Mojaloop we use both external orbs in `anchore-cli` and this internally developed orb, `mojaloop-deployment`
 
 download your access token etc: https://circleci.com/docs/2.0/local-cli/#configuring-the-cli
 ```bash
@@ -19,6 +22,12 @@ vi ./development/version
 # publish the updated org
 ./_publish.sh
 ```
+
+### pr-tools
+
+pr-tools is a common set of utilities for checking PRs in the mojaloop community:
+
+
 
 ### Initial setup notes (this should only be done once)
 
