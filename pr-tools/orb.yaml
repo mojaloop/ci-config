@@ -25,11 +25,14 @@ commands:
             apk add --no-cache -t build-dependencies make gcc g++ python libtool autoconf automake jq
             npm config set unsafe-perm true
             npm install -g node-gyp
+      # Orbs don't let you package anything more than basic shell scripts
+      # so we bootstrap this orb by checking out the code in the repo
+      # TODO: checkout based on deterministic git tag
       - run:
           name: checkout ci-config repo
           command: |
             git clone -b feat/pr-title-orb https://github.com/mojaloop/ci-config.git
-            cd ci-config && npm install
+            cd ci-config/pr-tools && npm install
       - run:
           name: Check the PR title
           command: |
