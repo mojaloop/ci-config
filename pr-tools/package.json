@@ -1,0 +1,23 @@
+{
+  "name": "@mojaloop/ci-config",
+  "version": "0.1.8",
+  "repository": "https://github.com/mojaloop/ci-config",
+  "author": "Lewis Daly <lewisd@crosslaketech.com>",
+  "license": "Apache 2.0",
+  "scripts": {
+    "audit:resolve": "SHELL=sh resolve-audit --production",
+    "audit:check": "SHELL=sh check-audit --production",
+    "updates:check": "npm-check-updates",
+    "updates:update": "npm-check-updates -u && npm install"
+  },
+  "dependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@commitlint/format": "^11.0.0",
+    "@commitlint/lint": "^11.0.0",
+    "@commitlint/load": "^11.0.0",
+    "@octokit/rest": "^18.0.12",
+    "@mojaloop/central-services-logger": "^10.6.0"
+  },
+  "devDependencies": {}
+}
