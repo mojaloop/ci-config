@@ -40,5 +40,10 @@ commands:
 jobs:
   pr-title-check:
     executor: default
+    parameters:
+      ci-config-branch:
+        default: master
+        type: string
     steps:
-      - setup-and-run-pr-title-check
+      - setup-and-run-pr-title-check:
+          ci-config-branch: << parameters.ci-config-branch >>
