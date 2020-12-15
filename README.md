@@ -7,9 +7,39 @@ To begin with, this will host CircleCI orbs we author and publish, but this coul
 ## CircleCI Orbs: 
 
 CirlceCI orbs are a way to share common config between CircleCI environment. In this repo, we author and maintain the shared orbs for the Mojaloop project.
-### mojaloop-deployment
 
-In Mojaloop we use both external orbs in `anchore-cli` and this internally developed orb, `mojaloop-deployment`
+### `mojaloop/pr-tools`
+
+pr-tools is a common set of utilities for checking PRs in the mojaloop community.
+
+- `pr-tools/pr-title-check`: Check the title of the pull request. Fails if the title doesn't conform to the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) spec
+
+
+#### Examples:
+
+This example adds a `pr-title-check` step in the build's jobs. If the build is not a consequence of a Pull request (e.g. a `tag` or `master` branch build), the `CIRCLE_PULL_REQUEST` and `CIRCLE_PULL_REQUESTS` environment variables will not be set by CircleCI, and this step will fail silently.
+
+```yaml
+version: 2.1
+
+orbs:
+  pr-tools: mojaloop/pr-tools@0.1.8
+
+workflows:
+  version: 2.1
+  build_and_test:
+    jobs:
+      - pr-tools/pr-title-check:
+          context: org-global
+```
+
+
+### `mojaloop/deployment` [DEPRECATED]
+
+`mojaloop/deployment` is an orb for automating common deployment functions. It was developed as a POC and is no longer maintained, since we are working on better approaches to deploying updated images to our dev environments. 
+
+
+In Mojaloop we use both external orbs and this internally developed orb, `mojaloop-deployment`
 
 download your access token etc: https://circleci.com/docs/2.0/local-cli/#configuring-the-cli
 ```bash
@@ -19,15 +49,9 @@ circleci setup
 # update the version in ./development/version
 vi ./development/version
 
-# publish the updated org
+# publish the updated orbs
 ./_publish.sh
 ```
-
-### pr-tools
-
-pr-tools is a common set of utilities for checking PRs in the mojaloop community:
-
-
 
 ### Initial setup notes (this should only be done once)
 
@@ -35,6 +59,28 @@ pr-tools is a common set of utilities for checking PRs in the mojaloop community
 circleci namespace create mojaloop github mojaloop #this can only be done once per org
 circleci orb create mojaloop/deployment
 circleci orb create mojaloop/pr-tools
+```
+
+### Publishing the orbs:
+
+```bash
+# download your access token etc: https://circleci.com/docs/2.0/local-cli/#configuring-the-cli
+# setup your env
+circleci setup
+
+cd development
+
+# update the version in ./development/version
+vi ./version
+
+# publish the updated orbs
+./_publish.sh
+
+cd ../pr-tools
+
+# pr-tools is a node-js based orb, so we manage the version number in package.json
+vi package.json
+./_publish
 ```
 
 ## Container Scanning
