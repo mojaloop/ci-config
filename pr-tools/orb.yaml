@@ -8,13 +8,24 @@ executors:
     working_directory: /home/circleci/project
     docker:
       - image: node:12.16.1-alpine
+      
+jobs:
+  pr-title-check:
+    executor: default
+    parameters:
+      ci-config-branch:
+        description: The branch of mojaloop/ci-config to bootstrap from
+        default: master
+        type: string
+    steps:
+      - setup-and-run-pr-title-check:
+          ci-config-branch: << parameters.ci-config-branch >>
 
 commands:
   setup-and-run-pr-title-check:
     description: Check the title of a Github pull request
     parameters:
       ci-config-branch:
-        default: master
         type: string
     steps:
       - run:
@@ -37,13 +48,3 @@ commands:
             echo "env CIRCLE_PULL_REQUEST: ${CIRCLE_PULL_REQUEST}"
             cd ci-config &&  ./pr-tools/_pr_title.js
 
-jobs:
-  pr-title-check:
-    executor: default
-    parameters:
-      ci-config-branch:
-        default: master
-        type: string
-    steps:
-      - setup-and-run-pr-title-check:
-          ci-config-branch: << parameters.ci-config-branch >>
