@@ -472,6 +472,12 @@ const policy = {
           gate: 'vulnerabilities',
           trigger_id: 'CVE-2020-7921+*',
         },
+        // Whitelist for cookie dependency in express https://github.com/anchore/anchore-engine/issues/304
+        {
+          id: 'rule11',
+          gate: 'vulnerabilities',
+          trigger_id: 'CVE-2017-18589+*',
+        },
       ]
     }
   ]
