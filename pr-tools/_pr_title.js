@@ -6,13 +6,7 @@ const format = require('@commitlint/format').default
 const conventional = require('@commitlint/config-conventional')
 const Logger = require('@mojaloop/central-services-logger')
 
-if (!process.env.GITHUB_TOKEN) {
-  throw new Error('Github token is required')
-}
-
-const octokit = new Octokit({
-  auth: process.env.GITHUB_TOKEN
-})
+const octokit = new Octokit({})
 
 if (!process.env.CIRCLE_PULL_REQUEST && !process.env.CIRCLE_PULL_REQUESTS) {
   Logger.info('No `CIRCLE_PULL_REQUEST` or `CIRCLE_PULL_REQUESTS` variable found')

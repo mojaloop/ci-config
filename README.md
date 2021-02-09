@@ -23,7 +23,7 @@ This example adds a `pr-title-check` step in the build's jobs. If the build is n
 version: 2.1
 
 orbs:
-  pr-tools: mojaloop/pr-tools@0.1.8
+  pr-tools: mojaloop/pr-tools@0.1.9
 
 workflows:
   version: 2.1
