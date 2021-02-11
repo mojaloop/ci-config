@@ -15,7 +15,8 @@ async function main() {
   if (!PULL_REQUEST_URL && config.FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST) {
     Logger.info('No `CIRCLE_PULL_REQUEST` variable found')
     Logger.info('No PR is associated with this build. Failing silently.')
-    process.exit(0)
+    
+    return
   }
 
   Logger.info(`prUrl is: ${PULL_REQUEST_URL}`)
@@ -51,12 +52,6 @@ async function main() {
 
   Logger.info('PR Title is valid')
 }
-
-main()
-  .catch(err => {
-    console.log('Error', err)
-    process.exit(1)
-  })
 
 module.exports = {
   main
