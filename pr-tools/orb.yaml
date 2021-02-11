@@ -46,5 +46,5 @@ commands:
           command: |
             echo "env CIRCLE_PULL_REQUESTS: ${CIRCLE_PULL_REQUESTS}"
             echo "env CIRCLE_PULL_REQUEST: ${CIRCLE_PULL_REQUEST}"
-            cd ci-config &&  ./pr-tools/_pr_title.js
+            cd ci-config/pr-tools &&  npm run pr-title
 
