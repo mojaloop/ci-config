@@ -34,12 +34,13 @@ async function main(config) {
     },
     {
       color: true,
+      helpUrl: config.GET_HELP_URL
     }
   );
 
   process.stdout.write(output);
   if (!lintResult.valid) {
-    process.exit(1)
+    throw new Error(`PR title: '${title}' is invalid.`)
   }
 
   Logger.info('PR Title is valid')
