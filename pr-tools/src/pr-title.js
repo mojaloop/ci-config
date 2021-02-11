@@ -17,6 +17,9 @@ const prUrl = process.env.CIRCLE_PULL_REQUEST || process.env.CIRCLE_PULL_REQUEST
 Logger.info(`prUrl is: ${prUrl}`)
 
 async function main() {
+  const config = Config.get('PR')
+
+
   // e.g. https://github.com/mojaloop/ml-operator/pull/7
   const [pull_number, _, repo, owner] = prUrl.split('/').reverse().slice(0, 4)
   const result = await octokit.pulls.get({
