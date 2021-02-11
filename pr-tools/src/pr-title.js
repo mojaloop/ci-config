@@ -1,5 +1,6 @@
 const lint  = require('@commitlint/lint').default
 const format = require('@commitlint/format').default
+const load = require('@commitlint/load').default
 const conventional = require('@commitlint/config-conventional')
 const Logger = require('@mojaloop/central-services-logger')
 const { getPRTitle } = require('./lib')
@@ -23,7 +24,13 @@ async function main(config) {
   const [pullNumber, _, repo, owner] = PULL_REQUEST_URL.split('/').reverse().slice(0, 4)
   const title = await getPRTitle(owner, repo, pullNumber)
   Logger.info(`PR title is: ${title}`)
-  const lintResult = await lint(title, conventional.rules)
+  const loadedRules = await load({
+    extends: [ '@commitlint/config-conventional' ], 
+    rules: conventional.rules
+  })
+  // console.log('loadedRules', loadedRules)
+  // console.log('conventional.rules', conventional.rules)
+  const lintResult = await lint(title, loadedRules.rules)
   Logger.debug(`lintResult title is: ${lintResult}`)
   const output = format(
     {

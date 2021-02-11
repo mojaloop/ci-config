@@ -19,9 +19,24 @@ describe('pr-title', () => {
     //nothing threw!
   })
 
-  it.only('allows breaking change one liners', async () => {
+  it('allows breaking change one liners', async () => {
     // Arrange
     getPRTitle.mockResolvedValueOnce('refactor!: drop support for Node 6')
+    const config = {
+      PULL_REQUEST_URL: 'https://mock-url.com',
+      FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST: true
+    }
+    
+    // Act
+    await main(config)
+
+    // Assert
+    //nothing threw!
+  })
+
+  it.only('allows breaking change one liners', async () => {
+    // Arrange
+    getPRTitle.mockResolvedValueOnce('refactor(thingo)!: drop support for Node 6')
     const config = {
       PULL_REQUEST_URL: 'https://mock-url.com',
       FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST: true
