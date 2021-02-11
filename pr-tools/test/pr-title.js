@@ -1,20 +1,55 @@
+const { getPRTitle } = require('../src/lib')
+jest.mock('../src/lib')
 const { main } = require('../src/pr-title')
 
-const { config } = require('../src/config')
-jest.mock('../src/config')
 
 describe('pr-title', () => {
+  // beforeEach(() => {
+  //   // Octokit.mockClear()
+  //   console.log('getPRTitle', getPRTitle)
+  // })
+
   it('checks the pr title', async () => {
     // Arrange
-    console.log('config is', config)
+    getPRTitle.mockResolvedValueOnce('chore: valid pr title')
+    const config = {
+      PULL_REQUEST_URL: 'https://mock-url.com',
+      FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST: true
+    }
     
     // Act
-    console.log('hello')
-    await main()
+    await main(config)
 
     // Assert
+    //nothing threw!
   })
 
-  it.todo('fails silently ')
-  it.todo('does not fail silently')
+  it('fails silently with an empty `PULL_REQUEST_URL`', async () => {
+    // Arrange
+    const config = {
+      PULL_REQUEST_URL: '',
+      FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST: true
+    }
+
+    // Act
+    await main(config)
+
+    // Assert
+    //nothing threw!
+  })
+
+  it('does not silently with an empty `PULL_REQUEST_URL`', async () => {
+    // Arrange
+    const config = {
+      PULL_REQUEST_URL: '',
+      FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST: false
+    }
+
+    // Act
+    const action = async () => await main(config)
+
+    // Assert
+    await expect(action()).rejects.toThrow('No PR is associated with this build.')
+  })
+
 })

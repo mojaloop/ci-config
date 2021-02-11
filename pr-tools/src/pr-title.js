@@ -1,35 +1,27 @@
-#!/usr/bin/env node
-
-const { Octokit } = require("@octokit/rest");
 const lint  = require('@commitlint/lint').default
 const format = require('@commitlint/format').default
 const conventional = require('@commitlint/config-conventional')
 const Logger = require('@mojaloop/central-services-logger')
+const { getPRTitle } = require('./lib')
 
-const { config } = require('./config')
 
-const octokit = new Octokit({})
-
-async function main() {
+async function main(config) {
   const PULL_REQUEST_URL = config.PULL_REQUEST_URL
-  if (!PULL_REQUEST_URL && config.FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST) {
-    Logger.info('No `CIRCLE_PULL_REQUEST` variable found')
-    Logger.info('No PR is associated with this build. Failing silently.')
-    
-    return
+  if (!PULL_REQUEST_URL) {
+    if (config.FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST) {
+      Logger.info('No `CIRCLE_PULL_REQUEST` variable found')
+      Logger.info('No PR is associated with this build. Failing silently as `FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST` is `true`')
+      return
+    }
+    Logger.error('No `CIRCLE_PULL_REQUEST` variable found')
+    throw new Error(`No PR is associated with this build.`)
   }
 
   Logger.info(`prUrl is: ${PULL_REQUEST_URL}`)
 
   // e.g. https://github.com/mojaloop/ml-operator/pull/7
-  const [pull_number, _, repo, owner] = PULL_REQUEST_URL.split('/').reverse().slice(0, 4)
-  const result = await octokit.pulls.get({
-    owner,
-    repo,
-    pull_number,
-  });
-
-  const title = result.data.title
+  const [pullNumber, _, repo, owner] = PULL_REQUEST_URL.split('/').reverse().slice(0, 4)
+  const title = await getPRTitle(owner, repo, pullNumber)
   Logger.info(`PR title is: ${title}`)
   const lintResult = await lint(title, conventional.rules)
   Logger.debug(`lintResult title is: ${lintResult}`)
