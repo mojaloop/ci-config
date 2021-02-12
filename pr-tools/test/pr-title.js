@@ -19,6 +19,21 @@ describe('pr-title', () => {
     //nothing threw!
   })
 
+  it('checks the pr title with no space after the colon', async () => {
+    // Arrange
+    getPRTitle.mockResolvedValueOnce('chore:invalid pr title')
+    const config = {
+      PULL_REQUEST_URL: 'https://mock-url.com',
+      FAIL_SILENTLY_WHEN_MISSING_CIRCLE_PULL_REQUEST: true
+    }
+    
+    // Act
+    const action = async () => await main(config)
+
+    // Assert
+    await expect(action()).rejects.toThrow('PR title')
+  })
+
   it('allows breaking change one liners', async () => {
     // Arrange
     getPRTitle.mockResolvedValueOnce('refactor!: drop support for Node 6')
@@ -62,7 +77,6 @@ describe('pr-title', () => {
     const action = async () => await main(config)
 
     // Assert
-    //nothing threw!
     await expect(action()).rejects.toThrow('PR title')
   })
 
