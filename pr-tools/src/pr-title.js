@@ -23,15 +23,33 @@ async function main(config) {
   // e.g. https://github.com/mojaloop/ml-operator/pull/7
   const [pullNumber, _, repo, owner] = PULL_REQUEST_URL.split('/').reverse().slice(0, 4)
   const title = await getPRTitle(owner, repo, pullNumber)
-  Logger.info(`PR title is: ${title}`)
-  const loadedRules = await load({
-    extends: [ '@commitlint/config-conventional' ], 
-    rules: conventional.rules
-  })
-  // console.log('loadedRules', loadedRules)
-  // console.log('conventional.rules', conventional.rules)
-  const lintResult = await lint(title, loadedRules.rules)
-  Logger.debug(`lintResult title is: ${lintResult}`)
+  Logger.info(`PR title is: ${JSON.stringify(title)}`)
+
+  // hack - for 0.1.9 backwards compatibility
+  let loadedRules
+  let options = {}
+  try {
+    loadedRules = await load({
+      extends: ['@commitlint/config-conventional' ], 
+      rules: conventional.rules
+    })
+    options = {
+      parserOpts: loadedRules.parserPreset.parserOpts
+    }
+  } catch (err) {
+    console.log('loaded rules error:', err)
+    // fallback to not handling breaking change syntax
+    // this is because 0.1.9 modules are installed funnily
+    loadedRules = await load({
+      rules: conventional.rules
+    })
+  }
+
+  const lintResult = await lint(title, loadedRules.rules, options)
+  
+  Logger.debug(`loaded rules are: ${JSON.stringify(loadedRules, null, 2)}`)
+  Logger.debug(`lintResult title is: ${JSON.stringify(lintResult, null, 2)}`)
+
   const output = format(
     {
       valid: lintResult.valid,

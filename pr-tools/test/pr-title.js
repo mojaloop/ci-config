@@ -34,7 +34,7 @@ describe('pr-title', () => {
     //nothing threw!
   })
 
-  it.only('allows breaking change one liners', async () => {
+  it('allows breaking change one liners', async () => {
     // Arrange
     getPRTitle.mockResolvedValueOnce('refactor(thingo)!: drop support for Node 6')
     const config = {
