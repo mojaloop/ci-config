@@ -16,7 +16,7 @@ Note that environment variables `SLACK_ACCESS_TOKEN` and `SLACK_DEFAULT_CHANNEL`
  ![success](./slack-temp-release-success.png) | SLACK_TEMP_RELEASE_SUCCESS | [slack-temp-release-success.json](./slack-temp-release-success.json)
  ![failure](./slack-temp-release-failure.png) | SLACK_TEMP_RELEASE_FAILURE | [slack-temp-release-failure.json](./slack-temp-release-failure.json)
 
-Slack Job Environment Configuration:
+**Slack Job Environment Configuration**:
 
 Env-config | Description | Required (Y/N)
 ---------|----------|---------
@@ -28,7 +28,7 @@ Env-config | Description | Required (Y/N)
  SLACK_CI_URL | URL to release build job | Y
  SLACK_CUSTOM_MSG | Optional custom message that supports Markdown | N
 
-Example:
+**Example**:
 
 ```yaml
   publish:
@@ -58,3 +58,7 @@ Example:
           event: fail
           template: SLACK_TEMP_RELEASE_FAILURE
 ```
+
+**Notes**:
+
+- Ensure that you place the `Setup Slack config` (see example) Run block prior to the actual deployment operations, otherwise on failures the Slack Job Environment Configuration will not be defined.
