@@ -21,7 +21,7 @@ Note that environment variables `SLACK_ACCESS_TOKEN` and `SLACK_DEFAULT_CHANNEL`
 Env-config | Description | Required (Y/N)
 ---------|----------|---------
  SLACK_PROJECT_NAME | Github Project Name | Y
- SLACK_RELEASE_TYPE | Release type, e.g. `GitHub Release`, `NPM Release`, `Docker Release` | Y
+ SLACK_RELEASE_TYPE | Release type, e.g. `GitHub Release`, `NPM Release`, `NPM Snapshot`, `Docker Release`, `Docker Snapshot` | Y
  SLACK_RELEASE_TAG | Semantic version, e.g. `v0.0.0` | Y
  SLACK_BUILD_ID | CI-CD build/build number, e.g. `1234` | Y
  SLACK_RELEASE_URL | URL to published artefact on Github, NPM or DockerHub | Y
