@@ -1,0 +1,55 @@
+{
+    "attachments": [
+        {
+            "color": "#FF3333",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "${SLACK_PROJECT_NAME}",
+                        "emoji": true
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "Type: `${SLACK_RELEASE_TYPE}`\nTag: `${SLACK_RELEASE_TAG}`"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "Status: 🔴 *FAILURE* @ Build: `${SLACK_BUILD_ID}`"
+                    },
+                    "accessory": {
+                        "type": "button",
+                        "text": {
+                            "type": "plain_text",
+                            "text": "View",
+                            "emoji": true
+                        },
+                        "value": "visit_job_btn",
+                        "url": "${SLACK_CI_URL}",
+                        "action_id": "button-action"
+                    }
+                },
+                {
+                    "type": "divider"
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "${SLACK_CUSTOM_MSG} "
+                    }
+                }
+            ]
+        }
+    ]
+}
