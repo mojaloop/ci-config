@@ -177,13 +177,13 @@ const policy = {
       rules: [
         {
           action: 'STOP',
-          comment: 'section 5.8. allow only whitelisted `mojaloop` ports 3000,3001,3002,3003,3007,3008,3080,3081,4001,4002,4004,4005,4006,8444',
+          comment: 'section 5.8. allow only whitelisted `mojaloop` ports 3000,3001,3002,3003,3007,3008,3080,3081,3082,4001,4002,4004,4005,4006,8444',
           gate: 'dockerfile',
           id: 'ef85285b-801b-48a4-b130-3a35e2d58133',
           params: [
             {
               name: 'ports',
-              value: '3000,3001,3002,3003,3007,3008,3080,3081,4001,4002,4004,4005,4006,8444'
+              value: '3000,3001,3002,3003,3007,3008,3080,3081,3082,4001,4002,4004,4005,4006,8444'
             },
             {
               name: 'type',
