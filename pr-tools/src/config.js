@@ -17,7 +17,7 @@ const ConvictConfig = Convict({
   GET_HELP_URL: {
     doc: 'The url to a help document',
     format: String,
-    default: 'https://docs.mojaloop.io/documentation/contributors-guide/standards/creating-new-features.html',
+    default: 'https://docs.mojaloop.io/community/standards/creating-new-features.html',
     env: 'GET_HELP_URL'
   }
 })
