@@ -7,7 +7,7 @@ version: 2.1
 # Orbs used in this pipeline
 ###
 orbs:
-  anchore: anchore/anchore-engine@1.6.6
+  anchore: anchore/anchore-engine@1.9.0
 
 ##
 # defaults
@@ -66,9 +66,9 @@ jobs:
           command: |
             docker pull node:12.16.0-alpine
             docker pull node:12.16.1-alpine
-            docker pull node:18-alpine3.19
+            docker pull node:18.20.3-alpine3.19
       - anchore/analyze_local_image:
-          image_name: docker.io/node:12.16.0-alpine docker.io/node:12.16.1-alpine docker.io/node:18-alpine3.19
+          image_name: docker.io/node:12.16.0-alpine docker.io/node:12.16.1-alpine docker.io/node:18.20.3-alpine3.19
           # TODO: is this even respecting this bundle? - maybe this can't be an absolute path
           policy_bundle_file_path: .circleci/.anchore/policy_bundle.json
           policy_failure: false
