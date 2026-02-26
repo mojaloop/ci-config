@@ -1,6 +1,8 @@
 const { Octokit } = require("@octokit/rest");
 
-const octokit = new Octokit({})
+const octokit = new Octokit({
+  auth: process.env.GITHUB_TOKEN || process.env.GH_TOKEN
+});
 
 async function getPRTitle(owner, repo, pullNumber) {
   const result = await octokit.pulls.get({
